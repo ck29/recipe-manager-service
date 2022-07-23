@@ -9,10 +9,8 @@ on:
       description:
         required: false
         default: 'Test and build'
-  push:
-    branches: [ "development" ]
   pull_request:
-    branches: [ "development" ]
+    branches: [ "master" ]
 
 jobs:
   build:
