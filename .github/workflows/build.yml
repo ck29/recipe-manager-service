@@ -4,6 +4,11 @@
 name: Java CI with Maven
 
 on:
+  workflow_dispatch:
+    inputs:
+      description:
+        required: false
+        default: 'Test and build'
   push:
     branches: [ "development" ]
   pull_request:
