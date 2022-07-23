@@ -2,9 +2,12 @@ package com.aab.assignment.facade;
 
 import org.springframework.stereotype.Component;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 
 @Component
 public class DBClient {
@@ -15,6 +18,10 @@ public class DBClient {
         return client;
     }
 
+    public DynamoDB getDynamodbClient(){
+        return new DynamoDB(this.client);
+    }
+
     public DBClient() {
         this.client = createDynamoDbClient();
     }
@@ -22,7 +29,7 @@ public class DBClient {
     private AmazonDynamoDB createDynamoDbClient() {
         return AmazonDynamoDBClientBuilder.standard()
                 .withEndpointConfiguration(
-                        new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "localhost"))
+                        new AwsClientBuilder.EndpointConfiguration("http://localhost:9000", "localhost"))
                 .build();
     }
 }
