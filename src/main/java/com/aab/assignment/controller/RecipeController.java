@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,13 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.aab.assignment.domain.Recipe;
 import com.aab.assignment.domain.Response;
+import com.aab.assignment.service.RecipeService;
 
 @Controller
 @RequestMapping(value = "recipe")
 public class RecipeController {
 
-    // @Autowired
-    // private PasswordService service;
+    @Autowired
+    private RecipeService service;
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "greet", method = RequestMethod.GET, produces = "application/json")
@@ -35,10 +37,9 @@ public class RecipeController {
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "new", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<Response> addRecipe(@RequestBody Recipe recipe) {
-        System.out.println(recipe.getName());
-        System.out.println(recipe.getInstructions());
+    @RequestMapping(value = "new", method = RequestMethod.POST, produces = "application/json") //TODO: Implement intelligent validation
+    public ResponseEntity<Response> addRecipe(@Validated @RequestBody(required = true) Recipe recipe) {
+        service.addRecipe(recipe);
         return new ResponseEntity<Response>(new Response("New recipe added."), HttpStatus.OK);
     }
 
