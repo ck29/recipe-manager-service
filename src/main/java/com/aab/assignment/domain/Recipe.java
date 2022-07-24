@@ -6,22 +6,25 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.aab.assignment.domain.validatation.AddRecipeValidateGroup;
+import com.aab.assignment.domain.validatation.DeleteRecipeValidateGroup;
+
 
 public class Recipe {
 
-    @NotBlank(message = "Recipe type cannot be empty")
+    @NotBlank(groups = {AddRecipeValidateGroup.class, DeleteRecipeValidateGroup.class}, message = "Recipe type cannot be empty")
     public String type;
 
-    @NotBlank(message = "Recipe cannot be empty")
+    @NotBlank(groups = {AddRecipeValidateGroup.class, DeleteRecipeValidateGroup.class}, message = "Recipe cannot be empty")
     public String name;
 
-    @NotNull(message = "Number of serving is required.")
+    @NotNull(groups = {AddRecipeValidateGroup.class}, message = "Number of serving is required.")
     public Integer serves;
 
-    @NotEmpty(message = "List of ingredients are required.")
+    @NotEmpty(groups = {AddRecipeValidateGroup.class}, message = "List of ingredients are required.")
     public List<String> ingredients;
 
-    @NotBlank(message = "Recipe instructions are required.")
+    @NotBlank(groups = {AddRecipeValidateGroup.class}, message = "Recipe instructions are required.")
     public StringBuffer instructions;
 
     public String getType() {

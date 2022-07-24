@@ -17,8 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.aab.assignment.domain.Recipe;
 import com.aab.assignment.domain.Response;
+import com.aab.assignment.domain.validatation.AddRecipeValidateGroup;
+import com.aab.assignment.domain.validatation.DeleteRecipeValidateGroup;
+import com.aab.assignment.exception.BadRequestException;
 import com.aab.assignment.exception.RecipeManagerException;
+import com.aab.assignment.exception.RecipeNotFoundException;
 import com.aab.assignment.service.RecipeService;
+import com.amazonaws.services.kms.model.NotFoundException;
 
 @Controller
 @RequestMapping(value = "recipe")
@@ -43,16 +48,20 @@ public class RecipeController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "new", method = RequestMethod.POST, produces = "application/json") //TODO: Implement intelligent validation
-    public ResponseEntity<Response> addRecipe(@Validated @RequestBody(required = true) Recipe recipe) {
+    public ResponseEntity<Response> addRecipe(@Validated({AddRecipeValidateGroup.class}) @RequestBody(required = true) Recipe recipe) {
         try{
             log.info("Adding new recipe.");
             service.addRecipe(recipe);
         }
         catch(RecipeManagerException e ){
             log.error(e.getMessage());
+            if (e instanceof BadRequestException){
+                return new ResponseEntity<Response>(new Response("Request cannot be completed as recipe already exists."), HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<Response>(new Response("Server Error."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<Response>(new Response("New recipe added."), HttpStatus.OK);
+        log.info("Added new recipe.");
+        return new ResponseEntity<Response>(new Response("New recipe added."), HttpStatus.CREATED);
     }
 
     @CrossOrigin(origins = "*")
@@ -63,8 +72,20 @@ public class RecipeController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "delete", method = RequestMethod.DELETE, produces = "application/json")
-    public ResponseEntity deleteRecipe() {
-        return new ResponseEntity("Hi, Its recipe manager.", HttpStatus.OK);
+    public ResponseEntity<Response> deleteRecipe(@Validated({DeleteRecipeValidateGroup.class}) @RequestBody(required = true) Recipe recipe) {
+        try{
+           log.info("Deleting recipe.");
+           service.deleteRecipe(recipe);
+        }
+        catch(RecipeManagerException e ){
+            log.error(e.getMessage());
+            if (e instanceof RecipeNotFoundException){
+                return new ResponseEntity<Response>(new Response("Recipe not found."), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<Response>(new Response("Server Error."), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        log.info("Recipe deleted.");
+        return new ResponseEntity<Response>(new Response("Recipe deleted."), HttpStatus.OK);
     }
 
 }
