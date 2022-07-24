@@ -1,5 +1,7 @@
 package com.aab.assignment.facade;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.aab.assignment.exception.RecipeManagerException;
@@ -14,6 +16,6 @@ abstract public class DataFacade implements RecipeDB{
     abstract public void query() throws RecipeManagerException;
     abstract public void scan() throws RecipeManagerException;
     abstract public void update() throws RecipeManagerException;
-    abstract public void delete() throws RecipeManagerException;
+    abstract public void  delete(Map<String, String> keys) throws RecipeManagerException;
 
 }

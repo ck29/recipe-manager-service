@@ -1,5 +1,8 @@
 package com.aab.assignment.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +21,8 @@ public class RecipeService {
 
     @Autowired
     private RecipeDataFacade facade;
-    
-    public void addRecipe(Recipe recipe) throws RecipeManagerException{
+
+    public void addRecipe(Recipe recipe) throws RecipeManagerException {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String recipe_json = mapper.writeValueAsString(recipe);
@@ -28,5 +31,17 @@ public class RecipeService {
             e.printStackTrace();
             throw new RecipeManagerException(e.getMessage());
         }
+    }
+
+    public void deleteRecipe(Recipe recipe) throws RecipeManagerException {
+        if (recipe != null) {
+            Map<String, String> keys = new HashMap<>();
+            keys.put("type", recipe.getType());
+            keys.put("name", recipe.getName());
+            facade.delete(keys);
+        } else {
+            throw new RecipeManagerException("Empty request cannot be processed.");
+        }
+
     }
 }
