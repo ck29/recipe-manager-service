@@ -1,29 +1,41 @@
 package com.aab.assignment.facade;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.validation.ValidationException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.aab.assignment.domain.Filter;
+import com.aab.assignment.domain.RecipeScanRequest.RecipeScanRequestBuilder;
 import com.aab.assignment.exception.BadRequestException;
 import com.aab.assignment.exception.RecipeManagerException;
 import com.aab.assignment.exception.RecipeNotFoundException;
 import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemUtils;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.PutItemSpec;
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.dynamodbv2.model.DeleteItemRequest;
-import com.amazonaws.services.dynamodbv2.model.DeleteItemResult;
 import com.amazonaws.services.dynamodbv2.model.ItemCollectionSizeLimitExceededException;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughputExceededException;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
+import com.amazonaws.services.dynamodbv2.model.ScanRequest;
+import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.xspec.ExpressionSpecBuilder;
 import com.amazonaws.services.dynamodbv2.xspec.PutItemExpressionSpec;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Component
 public class RecipeDataFacade extends DataFacade {
@@ -41,6 +53,7 @@ public class RecipeDataFacade extends DataFacade {
             PutItemSpec putItemSpec = createAddItemExpressionSpec(request);
             Table recipeTable = client.getDynamodbClient().getTable(TABLE);
             recipeTable.putItem(putItemSpec);
+
         } catch (ConditionalCheckFailedException | ItemCollectionSizeLimitExceededException
                 | ProvisionedThroughputExceededException | ResourceNotFoundException e) {
             e.printStackTrace();
@@ -105,20 +118,59 @@ public class RecipeDataFacade extends DataFacade {
     }
 
     @Override
-    public void query() throws RecipeManagerException {
-        // TODO Auto-generated method stub
+    public List<Map<String, Object>> scan() throws RecipeManagerException {
+        ScanRequest scanRequest;
+        try {
+            scanRequest = RecipeScanRequestBuilder.aRecipeScanRequest()
+                    .withTable(TABLE)
+                    .build();
+            ScanResult scanResult = client.getClient().scan(scanRequest);
+            return getResponse(scanResult);
+
+        } catch (ValidationException | ConditionalCheckFailedException e) {
+            e.printStackTrace();
+            throw new BadRequestException(e.getMessage());
+        } catch (ItemCollectionSizeLimitExceededException
+                | JsonProcessingException | ProvisionedThroughputExceededException | ResourceNotFoundException e) {
+            e.printStackTrace();
+            throw new RecipeManagerException("Server Error.");
+        } catch (Exception ex) {
+            log.error("Internal server error.");
+            throw new RecipeManagerException(ex.getMessage());
+        }
 
     }
 
-    @Override
-    public void scan() throws RecipeManagerException {
-        // TODO Auto-generated method stub
-
+    private List<Map<String, Object>> getResponse(ScanResult result) {
+        List<Map<String, Object>> __ = new ArrayList<>();
+        for (Map<String, AttributeValue> rec : result.getItems()) {
+            __.add(ItemUtils.toSimpleMapValue(rec));
+        }
+        return __;
     }
 
     @Override
-    public void update() throws RecipeManagerException {
-        // TODO Auto-generated method stub
+    public List<Map<String, Object>> scan(Filter filter) throws RecipeManagerException {
+        ScanRequest scanRequest;
+        try {
+            scanRequest = RecipeScanRequestBuilder.aRecipeScanRequest()
+                    .withTable(TABLE)
+                    .withFilter(filter)
+                    .build();
+            ScanResult scanResult = client.getClient().scan(scanRequest);
+            return getResponse(scanResult);
+
+        } catch (ItemCollectionSizeLimitExceededException
+                | JsonProcessingException | ProvisionedThroughputExceededException | ResourceNotFoundException e) {
+            e.printStackTrace();
+            throw new RecipeManagerException("Server Error.");
+        } catch (AmazonClientException e) {
+            e.printStackTrace();
+            throw new BadRequestException(e.getMessage());
+        } catch (Exception ex) {
+            log.error("Internal server error.");
+            throw new RecipeManagerException(ex.getMessage());
+        }
 
     }
 
