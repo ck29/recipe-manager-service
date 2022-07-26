@@ -84,7 +84,7 @@ public class RecipeController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "edit", method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<Response> updateRecipe(@Validated({
+    public ResponseEntity<Response> editRecipe(@Validated({
             UpdateRecipeValidateGroup.class }) @RequestBody(required = true) Map<String, Recipe> updateRequest) {
         try {
             log.info("Updating recipe.");
@@ -100,7 +100,7 @@ public class RecipeController {
             return new ResponseEntity<Response>(new Response("Server Error."), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         log.info("Recipe updated.");
-        return new ResponseEntity<Response>(new Response("Recipe updated."), HttpStatus.CREATED);
+        return new ResponseEntity<Response>(new Response("Recipe updated."), HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
