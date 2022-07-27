@@ -11,6 +11,8 @@ on:
         default: 'Test and build'
   pull_request:
     branches: [ "master" ]
+env:
+  PROJECT_DIR: $GITHUB_WORKSPACE
 
 jobs:
   build:
@@ -25,7 +27,21 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         cache: maven
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.8'
+
     - name: Test
       run: mvn test
+
     - name: Build
       run: mvn clean install
+
+    - name: Install dependencies
+      run: |
+        pip install -r $GITHUB_WORKSPACE/integration/tests/requirements.txt
+        ./$GITHUB_WORKSPACE/integration/scripts/start_db.sh
+        ./$GITHUB_WORKSPACE/integration/scripts/start_server.sh
+
+    - name: Integration Tests
+      run: python3 integration_tests.py

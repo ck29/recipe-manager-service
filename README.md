@@ -1,1 +1,2 @@
 # recipe-manager-service
+[![Test and Build](https://github.com/ck29/recipe-manager-service/actions/workflows/build.yml/badge.svg?branch=development)](https://github.com/ck29/recipe-manager-service/actions/workflows/build.yml)
