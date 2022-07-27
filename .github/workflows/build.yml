@@ -39,7 +39,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install -r /integration/tests/requirements.txt
+        pip install -r $GITHUB_WORKSPACE/integration/tests/requirements.txt
         $GITHUB_WORKSPACE/integration/scripts/start_db.sh
         $GITHUB_WORKSPACE/integration/scripts/start_server.sh
 
