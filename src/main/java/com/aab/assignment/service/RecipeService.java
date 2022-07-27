@@ -14,8 +14,8 @@ import com.aab.assignment.domain.Recipe;
 import com.aab.assignment.exception.BadRequestException;
 import com.aab.assignment.exception.RecipeManagerException;
 import com.aab.assignment.facade.RecipeDataFacade;
+import com.aab.assignment.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class RecipeService {
@@ -26,16 +26,20 @@ public class RecipeService {
     private RecipeDataFacade facade;
 
     public void addRecipe(Recipe recipe) throws RecipeManagerException {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            log.info("Add request received.");
-            String recipe_json = mapper.writeValueAsString(recipe);
-            facade.createItem(recipe_json);
-            log.info("Add request completed.");
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RecipeManagerException(e.getMessage());
+        if (recipe != null) {
+            try {
+                log.info("Add request received.");
+                String recipe_json = JsonUtil.toJson(recipe);
+                facade.createItem(recipe_json);
+                log.info("Add request completed.");
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+                throw new RecipeManagerException(e.getMessage());
+            }
+        } else {
+            throw new RecipeManagerException("Empty request cannot be processed.");
         }
+
     }
 
     public void deleteRecipe(Recipe recipe) throws RecipeManagerException {
@@ -53,32 +57,31 @@ public class RecipeService {
     }
 
     public void updateRecipe(Map<String, Recipe> updateRequest) throws RecipeManagerException {
-        if (updateRequest != null){
+        if (updateRequest != null) {
             log.info("Update request received.");
-            Recipe existingRecipe = updateRequest.get("existing"); //TODO Validate existing from DB
+            Recipe existingRecipe = updateRequest.get("existing"); // TODO Validate existing from DB
             Recipe newRecipe = updateRequest.get("new");
 
-            if(existingRecipe.equals(newRecipe)){
+            if (existingRecipe.equals(newRecipe)) {
                 throw new BadRequestException("Recipe already exists.");
             }
             this.deleteRecipe(existingRecipe);
             this.addRecipe(newRecipe);
             log.info("Delete request completed.");
-        }else{
+        } else {
             throw new RecipeManagerException("Empty request cannot be processed.");
         }
     }
 
-
-    public List<Map<String, Object>> getRecepies(Filter filter) throws RecipeManagerException{
-        if(filter!=null){
-           return facade.scan(filter);
-        }else{
+    public List<Map<String, Object>> getRecepies(Filter filter) throws RecipeManagerException {
+        if (filter != null) {
+            return facade.scan(filter);
+        } else {
             throw new RecipeManagerException("Empty request cannot be processed.");
         }
     }
 
-    public List<Map<String, Object>> getRecepies() throws RecipeManagerException{
+    public List<Map<String, Object>> getRecepies() throws RecipeManagerException {
         return facade.scan();
     }
 

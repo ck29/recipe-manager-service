@@ -138,12 +138,17 @@ public class RecipeDataFacade extends DataFacade {
 
     }
 
-    private List<Map<String, Object>> getResponse(ScanResult result) {
-        List<Map<String, Object>> __ = new ArrayList<>();
-        for (Map<String, AttributeValue> rec : result.getItems()) {
-            __.add(ItemUtils.toSimpleMapValue(rec));
+    private List<Map<String, Object>> getResponse(ScanResult result) throws RecipeManagerException {
+        if(result!=null){
+            List<Map<String, Object>> __ = new ArrayList<>();
+            for (Map<String, AttributeValue> rec : result.getItems()) {
+                __.add(ItemUtils.toSimpleMapValue(rec));
+            }
+            return __;
         }
-        return __;
+
+        throw new RecipeManagerException("Error retrieving the records.");
+        
     }
 
     @Override
