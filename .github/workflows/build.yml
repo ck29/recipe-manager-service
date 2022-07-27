@@ -12,7 +12,7 @@ on:
   pull_request:
     branches: [ "master" ]
 env:
-  PROJECT_DIR: $GITHUB_WORKSPACE
+  PROJECT_DIR: ${{github.workspace}}
 
 jobs:
   build:
@@ -30,9 +30,6 @@ jobs:
     - uses: actions/setup-python@v1
       with:
         python-version: '3.8'
-
-    - name: Test
-      run: mvn test
 
     - name: Build
       run: mvn clean install
