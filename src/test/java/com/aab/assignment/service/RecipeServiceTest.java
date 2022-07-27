@@ -1,10 +1,15 @@
 package com.aab.assignment.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.notNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +20,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import com.aab.assignment.domain.Filter;
 import com.aab.assignment.domain.Recipe;
+import com.aab.assignment.exception.BadRequestException;
 import com.aab.assignment.exception.RecipeManagerException;
 import com.aab.assignment.facade.RecipeDataFacade;
 import com.aab.assignment.utils.JsonUtil;
@@ -45,7 +52,6 @@ public class RecipeServiceTest {
             service.addRecipe(reqRecipe);
             assert(true);
         } catch (RecipeManagerException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             assert(false);
         }
@@ -89,15 +95,31 @@ public class RecipeServiceTest {
 
 
     @Test
-    void testGetRecepies() {
+    void testGetRecepies() throws JsonMappingException, JsonProcessingException {
+        String recipeList = "{\"instructions\":\"fry on pan.\",\"serves\":1,\"name\":\"omlet\",\"ingredients\":[\"egg\",\"onion\"],\"type\":\"non veg\"}";
+        Map<String, Object> r =  JsonUtil.toObject(recipeList, HashMap.class);
 
+        List<Map<String, Object>> rList = new ArrayList<>();
+        rList.add(r);
+
+        try {
+            when(facade.scan()).thenReturn(rList);
+            List<Map<String, Object>> sResponse = service.getRecepies();
+            assertEquals(1, sResponse.size());
+        } catch (RecipeManagerException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            when(facade.scan((Filter)notNull())).thenReturn(rList);
+            List<Map<String, Object>> sResponse = service.getRecepies(new Filter());
+            assertEquals(1, sResponse.size());
+        } catch (RecipeManagerException e) {
+            e.printStackTrace();
+        }
     }
 
-    @Test
-    void testGetRecepies2() {
-
-    }
-
+    
     @Test
     void testUpdateRecipe() throws JsonMappingException, JsonProcessingException {
         String existing_rcp = "{\"name\":\"veg salad\",\"type\":\"veg\",\"ingredients\":[\"tomato\",\"raddish\"],\"serves\":2,\"instructions\":\"cut and put in bowl.\"}";
@@ -118,6 +140,46 @@ public class RecipeServiceTest {
         } catch(Exception e){
             assert(false);
         }
+
+    }
+
+    @Test
+    void testUpdateRecipeSameRecipe() throws JsonMappingException, JsonProcessingException {
+        String existing_rcp = "{\"name\":\"veg salad\",\"type\":\"veg\",\"ingredients\":[\"tomato\",\"raddish\"],\"serves\":2,\"instructions\":\"cut and put in bowl.\"}";
+        Recipe existing = JsonUtil.toObject(existing_rcp, Recipe.class);
+
+        String new_rcp = "{\"name\":\"veg salad\",\"type\":\"veg\",\"ingredients\":[\"tomato\",\"raddish\"],\"serves\":2,\"instructions\":\"cut and put in bowl.\"}";
+        Recipe newR = JsonUtil.toObject(new_rcp, Recipe.class);
+
+        Map<String, Recipe> updateRequest = new HashMap<>();
+        updateRequest.put("existing", existing);
+        updateRequest.put("new", newR);
+        
+        try {
+            service.updateRecipe(updateRequest);
+            assert(false);
+        } catch (BadRequestException e) {
+            assert(true);
+        } catch(Exception e){
+            assert(false);
+        }
+
+
+    }
+
+    @Test
+    void testUpdateRecipeNotinput() throws JsonMappingException, JsonProcessingException {
+
+        Map<String, Recipe> updateRequest = null;
+        try {
+            service.updateRecipe(updateRequest);
+            assert(false);
+        } catch (BadRequestException e) {
+            assert(false);
+        } catch(RecipeManagerException e){
+            assert(true);
+        }
+
 
     }
 }
