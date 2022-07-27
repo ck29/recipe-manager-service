@@ -40,7 +40,9 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r $GITHUB_WORKSPACE/integration/tests/requirements.txt
-        $GITHUB_WORKSPACE/integration/scripts/start_db.sh
+        sudo chmod a+x $GITHUB_WORKSPACE/integration/scripts/start_db.sh  
+        sudo $GITHUB_WORKSPACE/integration/scripts/start_db.sh
+        sudo chmod a+x $GITHUB_WORKSPACE/integration/scripts/start_server.sh
         $GITHUB_WORKSPACE/integration/scripts/start_server.sh
 
     - name: Integration Tests
