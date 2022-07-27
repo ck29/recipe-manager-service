@@ -27,7 +27,7 @@ public class DBClient {
     private AmazonDynamoDB createDynamoDbClient() {
         return AmazonDynamoDBClientBuilder.standard()
                 .withEndpointConfiguration(
-                        new AwsClientBuilder.EndpointConfiguration("http://localhost:9000", "localhost"))
+                        new AwsClientBuilder.EndpointConfiguration("http://localhost:8000", "localhost"))
                 .build();
     }
 }

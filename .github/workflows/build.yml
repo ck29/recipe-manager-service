@@ -25,7 +25,9 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         cache: maven
-    - name: Test
-      run: mvn test
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.8'
+
     - name: Build
       run: mvn clean install
