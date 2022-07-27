@@ -10,7 +10,7 @@ from fixtures import data as data_store
 
 class TestIntegration(unittest.TestCase):
 
-    @skip
+
     def test_create_recipe(self):
         url = "http://localhost:8080/recipe/new"
 
