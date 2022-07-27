@@ -31,3 +31,9 @@ jobs:
 
     - name: Build
       run: mvn clean install
+
+    - name: Export artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Application executable
+        path: ${{ github.workspace }}/target/*.jar
