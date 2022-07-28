@@ -28,6 +28,7 @@
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="##installation-manual">Installation</a></li>
+        <li><a href="##integration-test">Integration Test</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -127,12 +128,23 @@ Make sure the following tools are installed on your local machine.
 
 ### Installation via docker
     coming soon
+### Integration Test
+Make sure the database and application is running before starting the integration tests.
+
+1. Create table
+   ```shell
+   cd recipe-manager-service
+   aws dynamodb create-table --cli-input-json file://data/data_model/recipes.json --endpoint-url http://localhost:8000
+   ```
+2. Run tests
+   ```
+   python3 integration/tests/integration_tests.py
+   ```
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 Import POSTMAN requests available in `data` directory.
-
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
