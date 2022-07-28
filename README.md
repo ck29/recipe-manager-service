@@ -102,14 +102,14 @@ Make sure the following tools are installed on your local machine.
   ```
 * AWS CLI
   ```shell
-    pip3 install awscli
-    aws configure set aws_access_key_id 'some_random_key_without_quotes'
-    aws configure set aws_secret_access_key 'some_random_secret_without_quotes'
+  pip3 install awscli
+  aws configure set aws_access_key_id 'some_random_key_without_quotes'
+  aws configure set aws_secret_access_key 'some_random_secret_without_quotes'
   ```
 ### Installation (Manual)
   1. Clone the project.
      ```
-      git clone https://github.com/ck29/recipe-manager-service.git
+     git clone https://github.com/ck29/recipe-manager-service.git
      ```
   2. Clean and build
      ```shell
@@ -124,7 +124,16 @@ Make sure the following tools are installed on your local machine.
      ```shell
      docker run -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -dbPath . -sharedDb
      ```
-     
+### Installation using jar
+1. Download jar by navigating to Gitactions. Open latest build and download artifact.
+2. Extract the zip file and start application
+   ```shell
+   java -jar recipe-manager-service-0.0.1-SNAPSHOT.jar
+   ```
+3. Open new terminal and navigate to project directory,
+   ```shell
+   docker run -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -dbPath . -sharedDb
+   ```
 
 ### Installation via docker
     coming soon
@@ -144,7 +153,75 @@ Make sure the database and application is running before starting the integratio
 
 <!-- USAGE EXAMPLES -->
 ## Usage
-Import POSTMAN requests available in `data` directory.
+
+1. Once the application is running, we can query the API using various method. The details about the endpoints are available using openapi specification. The specification can be downloaded using following link.
+   
+    [OPEN API SPECIFICATION](https://github.com/ck29/recipe-manager-service/blob/master/data/swagger/swagger.yml)
+
+
+2. Run application using POSTMAN. Download and import POSTMAN package.
+
+   [POSTMAN PACKAGE](https://github.com/ck29/recipe-manager-service/blob/master/data/postman/Recipe%20Management.postman_collection.json)
+
+### Filtering Recipes
+
+The retrieve recipe operation comes with advanced filtering option. The filter data needs to be passed using body of HTTP request. The filter expression is backed by Amazon DynanamoDB
+Here are some examples of creating filters.
+
+1. Get all veg recipes.
+   ```shell
+   GET /recipe/ HTTP/1.1
+   Host: localhost:8080
+   Content-Type: application/json
+   
+   {
+    "expression":"(#type=:type)",
+    "attributeNames": {
+        "#type": "type"
+    },
+    "attributeValues":{
+        ":type": "veg" 
+    }
+   }
+   ```
+2. Serves 1 person and contains mushroom.
+   ```shell
+   GET /recipe/ HTTP/1.1
+   Host: localhost:8080
+   Content-Type: application/json
+   
+   {
+    "expression":"(#serves=:serves and contains(#ingredients,:ingredients))",
+    "attributeNames": {
+        "#serves": "serves",
+        "#ingredients": "ingredients"
+    },
+    "attributeValues":{
+        ":ingredients": "mushroom",
+        ":serves": 1
+     }
+   }
+   ```
+
+3. Doesn't contain potato and instruction has oven.
+    ```shell
+   GET /recipe/ HTTP/1.1
+   Host: localhost:8080
+   Content-Type: application/json
+   
+   {
+    "expression":"(contains(#ins,:ins) and not(contains(#ingredients,:ingredients)))",
+    "attributeNames": {
+        "#ins": "instructions",
+        "#ingredients": "ingredients"
+    },
+    "attributeValues":{
+        ":ingredients": "potato",
+        ":ins": "oven"
+    }
+   }
+   ```
+   
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
