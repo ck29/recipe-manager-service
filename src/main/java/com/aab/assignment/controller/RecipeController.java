@@ -89,7 +89,6 @@ public class RecipeController {
         try {
             log.info("Updating recipe.");
             service.updateRecipe(updateRequest);
-            // TODO fix constrain validation
         } catch (RecipeManagerException e) {
             log.error(e.getMessage());
             if (e instanceof BadRequestException) {
