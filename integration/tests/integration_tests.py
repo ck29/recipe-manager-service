@@ -59,5 +59,46 @@ class TestIntegration(unittest.TestCase):
         for r in response_list:
             assert r["type"] == "veg"
 
+    def test_update_recipe(self):
+        url = "http://localhost:8080/recipe/edit"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        data = data_store.update_recipe_request
+
+        response = requests.request("PUT", url, headers=headers, data= json.dumps(data))
+        assert response.status_code == 200
+
+    def test_update_recipe_same_recipe(self):
+        url = "http://localhost:8080/recipe/edit"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        data = data_store.update_recipe_request_2
+
+        response = requests.request("PUT", url, headers=headers, data= json.dumps(data))
+        assert response.status_code == 400
+
+    def test_delete_recipe(self):
+        url = "http://localhost:8080/recipe/delete"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        data = data_store.delete_recipe_request
+
+        response = requests.request("DELETE", url, headers=headers, data= json.dumps(data))
+        assert response.status_code == 200
+
+    def test_delete_recipe_non_existent_recipe(self):
+        url = "http://localhost:8080/recipe/delete"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        data = data_store.delete_recipe_request_2
+
+        response = requests.request("DELETE", url, headers=headers, data= json.dumps(data))
+        assert response.status_code == 404
+
+
 if __name__ == '__main__':
     unittest.main()

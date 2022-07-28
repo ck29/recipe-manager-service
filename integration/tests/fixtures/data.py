@@ -12,3 +12,40 @@ get_recipe_filter_all_veg_items ={
         ":type": "veg"
     }
 }
+
+update_recipe_request = {
+    "existing": {
+        "name": "fries",
+        "type": "veg",
+        "ingredients": ["potato"],
+        "serves": 2,
+        "instructions": "bake in oven."
+    },
+    "new": {
+        "name": "fries",
+        "type": "veg",
+        "ingredients": ["potato", "oil"],
+        "serves": 3,
+        "instructions": "bake in oven."
+    }
+}
+
+update_recipe_request_2 = {
+    "existing": {
+        "name": "fries",
+        "type": "veg",
+        "ingredients": ["potato", "oil"],
+        "serves": 3,
+        "instructions": "bake in oven."
+    },
+    "new": {
+        "name": "fries",
+        "type": "veg",
+        "ingredients": ["potato", "oil"],
+        "serves": 3,
+        "instructions": "bake in oven."
+    }
+}
+
+delete_recipe_request = {"name": "soup", "type": "veg"}
+delete_recipe_request_2 = {"name": "salad", "type": "veg"}
