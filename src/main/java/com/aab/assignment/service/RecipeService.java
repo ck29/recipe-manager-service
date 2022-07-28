@@ -59,7 +59,7 @@ public class RecipeService {
     public void updateRecipe(Map<String, Recipe> updateRequest) throws RecipeManagerException {
         if (updateRequest != null) {
             log.info("Update request received.");
-            Recipe existingRecipe = updateRequest.get("existing"); // TODO Validate existing from DB
+            Recipe existingRecipe = updateRequest.get("existing"); 
             Recipe newRecipe = updateRequest.get("new");
 
             if (existingRecipe.equals(newRecipe)) {
