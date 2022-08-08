@@ -3,7 +3,6 @@ package com.aab.assignment.controller;
 import com.aab.assignment.domain.Recipe;
 import com.aab.assignment.domain.Response;
 import com.aab.assignment.domain.validatation.groups.AddRecipeValidateGroup;
-import com.aab.assignment.domain.validatation.groups.DeleteRecipeValidateGroup;
 import com.aab.assignment.domain.validatation.groups.UpdateRecipeValidateGroup;
 import com.aab.assignment.exception.BadRequestException;
 import com.aab.assignment.exception.RecipeManagerException;
@@ -14,14 +13,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequestMapping(value = "recipe")
 public class RecipeController {
 
@@ -32,21 +30,24 @@ public class RecipeController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = { "/", "" }, method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<?> getRecipes(@RequestParam(required = false) Map<String, String> filterCondition)
+    public ResponseEntity<?> getRecipes(
+            @RequestParam(required = false) Map<String, String> filterCondition)
             throws BadRequestException, RecipeManagerException {
-        // TODO validate filter
+
         List<Map<String, Object>> result = null;
         result = service.getRecepies(filterCondition);
-        return new ResponseEntity<List<Map<String, Object>>>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = { "/{name}" }, method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<?> getRecipe(@PathVariable String name)
+    public ResponseEntity<?> getRecipe(
+            @PathVariable String name)
             throws BadRequestException, RecipeNotFoundException, RecipeManagerException {
+
         Map<String, Object> result = null;
         result = service.getRecipe(name);
-        return new ResponseEntity<Map<String, Object>>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
@@ -57,32 +58,32 @@ public class RecipeController {
         log.info("Adding new recipe.");
         service.addRecipe(recipe);
         log.info("Added new recipe.");
-        return new ResponseEntity<Response>(new Response("New recipe added."), HttpStatus.CREATED);
+        return new ResponseEntity<>(new Response("New recipe added."), HttpStatus.CREATED);
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = { "/{name}", "" }, method = RequestMethod.PUT, produces = "application/json")
-    public ResponseEntity<Response> editRecipe(
-            @Validated({
-                    UpdateRecipeValidateGroup.class }) @RequestBody(required = true) Map<String, Recipe> updateRequest)
+    @RequestMapping(value = { "/{name}"}, method = RequestMethod.PUT, produces = "application/json")
+    public ResponseEntity<?> editRecipe(
+            @Validated({ UpdateRecipeValidateGroup.class })
+            @RequestBody(required = true) Recipe updateRequest, @PathVariable(required = true) String name)
             throws RecipeManagerException {
         log.info("Updating recipe.");
-        service.updateRecipe(updateRequest);
+        Map<String, Object> result = service.updateRecipe(updateRequest, name);
 
         log.info("Recipe updated.");
-        return new ResponseEntity<Response>(new Response("Recipe updated."), HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = { "/", "" }, method = RequestMethod.DELETE, produces = "application/json")
+    @RequestMapping(value = { "/{name}", }, method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity<Response> deleteRecipe(
-            @Validated({ DeleteRecipeValidateGroup.class }) @RequestBody(required = true) Recipe recipe)
+            @PathVariable(required = true) String name)
             throws RecipeManagerException {
         log.info("Deleting recipe.");
-        service.deleteRecipe(recipe);
+        service.deleteRecipe(name);
 
         log.info("Recipe deleted.");
-        return new ResponseEntity<Response>(new Response("Recipe deleted."), HttpStatus.OK);
+        return new ResponseEntity<>(new Response("Recipe deleted."), HttpStatus.OK);
     }
 
 }

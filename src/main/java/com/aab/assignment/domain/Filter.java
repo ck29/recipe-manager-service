@@ -112,21 +112,10 @@ public class Filter {
     }
 
 
-    private boolean IsValidFilterList(Map<String, String> filterQuery) {
+    public static boolean IsValidFilterList(Map<String, String> filterQuery) {
         Map<String, String> filterQueryCopy = new HashMap<>(filterQuery);
         List<String> allowed = AllowedFilters.getAllowedFilters();
         filterQueryCopy.keySet().retainAll(allowed);
         return filterQueryCopy.size() == filterQuery.size();
-    }
-
-
-    public static void main(String[] args) {
-        Map<String, String> m = new HashMap<>();
-        m.put("type","salad");
-        m.put("minimum-serves","2");
-        m.put("ingredients-contains","tomato");
-        m.put("instructions-not-contains","oven");
-//        m.put("name","oven");
-        Filter f = new Filter(m);
     }
 }

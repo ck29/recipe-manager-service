@@ -59,7 +59,6 @@ public class RecipeDataFacade extends DataFacade {
     private PutItemSpec createAddItemExpressionSpec(String request) {
         PutItemExpressionSpec PUT_ITEM_EXPRESSION_SPEC = new ExpressionSpecBuilder()
                 .withCondition(ExpressionSpecBuilder.S("name").notExists())
-//                .withCondition(ExpressionSpecBuilder.S("type").notExists())
                 .buildForPut();
 
         return new PutItemSpec()
@@ -97,12 +96,11 @@ public class RecipeDataFacade extends DataFacade {
         deleteItemRequest.setTableName(TABLE);
         deleteItemRequest.setKey(keys);
 
-        String conditionExpression = "attribute_exists(#name) And attribute_exists(#type)";
+        String conditionExpression = "attribute_exists(#name)";
         deleteItemRequest.setConditionExpression(conditionExpression);
 
         Map<String, String> expressionAttributeNames = new HashMap<>();
         expressionAttributeNames.put("#name", "name");
-        expressionAttributeNames.put("#type", "type");
         deleteItemRequest.setExpressionAttributeNames(expressionAttributeNames);
 
         return deleteItemRequest;
