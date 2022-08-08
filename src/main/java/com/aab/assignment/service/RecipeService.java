@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class RecipeService {
     public void updateRecipe(Map<String, Recipe> updateRequest) throws RecipeManagerException {
         if (updateRequest != null) {
             log.info("Update request received.");
-            Recipe existingRecipe = updateRequest.get("existing"); 
+            Recipe existingRecipe = updateRequest.get("existing");
             Recipe newRecipe = updateRequest.get("new");
 
             if (existingRecipe.equals(newRecipe)) {
@@ -73,16 +74,26 @@ public class RecipeService {
         }
     }
 
-    public List<Map<String, Object>> getRecepies(Filter filter) throws RecipeManagerException {
-        if (filter != null) {
+    public List<Map<String, Object>> getRecepies(Map<String, String> filter) throws BadRequestException, RecipeManagerException {
+
+        if (!filter.isEmpty() && isValidFilter(filter)) {
             return facade.scan(filter);
-        } else {
-            throw new RecipeManagerException("Empty request cannot be processed.");
+        }else{
+            return facade.scan();
         }
     }
 
-    public List<Map<String, Object>> getRecepies() throws RecipeManagerException {
-        return facade.scan();
+    private boolean isValidFilter(Map<String, String> filter) {
+        return true;
     }
 
+    public Map<String, Object> getRecipe(String name) throws BadRequestException, RecipeManagerException {
+        if (StringUtils.isNotEmpty(name)) {
+            Map<String, String> filter = new HashMap<>();
+            filter.put("name", name);
+            return facade.scan(filter).get(0);
+        } else {
+            throw new BadRequestException("Invalid recipe");
+        }
+    }
 }
