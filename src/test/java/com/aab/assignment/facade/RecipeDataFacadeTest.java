@@ -2,8 +2,7 @@ package com.aab.assignment.facade;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.aab.assignment.exception.BadRequestException;
+import com.aab.assignment.exception.RecipeAlreadyExistsException;
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -67,6 +70,23 @@ public class RecipeDataFacadeTest {
         }catch(Exception e){
             assert(false);
         }
+
+        doThrow(new AmazonServiceException("service error")).when(mockTable).putItem((PutItemSpec)notNull());
+        try{
+            facade.createItem("{}");
+            assert(false);
+        }catch(RecipeAlreadyExistsException e){
+            assert(true);
+        }
+
+        doThrow(new AmazonClientException("service error")).when(mockTable).putItem((PutItemSpec)notNull());
+        try{
+            facade.createItem("{}");
+            assert(false);
+        }catch(RecipeManagerException e){
+            assert(true);
+        }
+
     }
 
     @Test
@@ -92,7 +112,6 @@ public class RecipeDataFacadeTest {
     public void testDelete() {
         Map<String, String> request = new HashMap<>();
         request.put("name", "salad");
-        request.put("type", "veg");
 
         AmazonDynamoDB dd = Mockito.mock(AmazonDynamoDB.class);
 
@@ -136,7 +155,7 @@ public class RecipeDataFacadeTest {
                 item1.put("type", "veg");
                 item1.put("ingredients", Arrays.asList("Tomato", "raddish"));
                 item1.put("instructions", "cut and put");
-        
+
         List <Map<String, AttributeValue>> items = new ArrayList<>();
         items.add(ItemUtils.fromSimpleMap(item1));
         scanResult.setItems(items);
@@ -150,14 +169,35 @@ public class RecipeDataFacadeTest {
         } catch (RecipeManagerException e) {
             assert(false);
         }
+
+        doThrow(new AmazonServiceException("service error")).when(dd).scan((ScanRequest)notNull());
+        try{
+            facade.scan();
+            assert(false);
+        }catch(BadRequestException e){
+            assert(true);
+        }
+
+        doThrow(new AmazonClientException("service error")).when(dd).scan((ScanRequest)notNull());
+        try{
+            facade.scan();
+            assert(false);
+        }catch(RecipeManagerException e){
+            assert(true);
+        }
     }
 
     @Test
     void testScanWithFilter() {
 
+        Map<String,String> queryfilter = new HashMap<String, String>(){{
+            put("type","veg");
+            put("name","salad");
+        }};
+
         Filter filter = new Filter();
         filter.setExpression("#type=:type And #name=:name");
-        
+
         Map<String, String> attrName = new HashMap<>();
         attrName.put("#type", "type");
         attrName.put("#name", "name");
@@ -167,7 +207,7 @@ public class RecipeDataFacadeTest {
         attrValue.put(":name","salad");
         filter.setAttributeNames(attrName);
         filter.setAttributeValues(attrValue);
-        
+
         ScanRequest scanRequest = null;
         try {
             scanRequest = RecipeScanRequestBuilder.aRecipeScanRequest()
@@ -184,7 +224,7 @@ public class RecipeDataFacadeTest {
                 item1.put("type", "veg");
                 item1.put("ingredients", Arrays.asList("Tomato", "raddish"));
                 item1.put("instructions", "cut and put");
-        
+
         List <Map<String, AttributeValue>> items = new ArrayList<>();
         items.add(ItemUtils.fromSimpleMap(item1));
         scanResult.setItems(items);
@@ -193,11 +233,27 @@ public class RecipeDataFacadeTest {
         when(client.getClient()).thenReturn(dd);
         when(dd.scan((ScanRequest)notNull())).thenReturn(scanResult);
 
+
         try {
-            List<Map<String, Object>> response =  facade.scan(filter);
+            List<Map<String, Object>> response =  facade.scan(queryfilter);
             assertEquals(response.size(), 1);
         } catch (RecipeManagerException e) {
             assert(false);
+        }
+        doThrow(new AmazonServiceException("service error")).when(dd).scan((ScanRequest)notNull());
+        try{
+            facade.scan(queryfilter);
+            assert(false);
+        }catch(BadRequestException e){
+            assert(true);
+        }
+
+        doThrow(new AmazonClientException("service error")).when(dd).scan((ScanRequest)notNull());
+        try{
+            facade.scan(queryfilter);
+            assert(false);
+        }catch(RecipeManagerException e){
+            assert(true);
         }
     }
 }

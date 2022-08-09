@@ -52,13 +52,15 @@ public class RecipeController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = { "/", "" }, method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<Response> addRecipe(
+    public ResponseEntity<?> addRecipe(
             @Validated({ AddRecipeValidateGroup.class }) @RequestBody(required = true) Recipe recipe)
             throws RecipeManagerException {
         log.info("Adding new recipe.");
-        service.addRecipe(recipe);
+
+        Map<String, Object> result = null;
+        result = service.addRecipe(recipe);
         log.info("Added new recipe.");
-        return new ResponseEntity<>(new Response("New recipe added."), HttpStatus.CREATED);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @CrossOrigin(origins = "*")

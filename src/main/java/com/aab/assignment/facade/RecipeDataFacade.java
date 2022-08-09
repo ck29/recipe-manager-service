@@ -44,7 +44,7 @@ public class RecipeDataFacade extends DataFacade {
             recipeTable.putItem(putItemSpec);
 
         } catch (AmazonServiceException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
 
             if(e instanceof ResourceNotFoundException){
                 throw new RecipeManagerException(e.getMessage());
@@ -79,12 +79,11 @@ public class RecipeDataFacade extends DataFacade {
         try {
             DeleteItemRequest deleteItemRequest = createDeleteItemRequest(updateKeys);
             client.getClient().deleteItem(deleteItemRequest);
-        } catch (ConditionalCheckFailedException | ItemCollectionSizeLimitExceededException
-                | ProvisionedThroughputExceededException | ResourceNotFoundException e) {
+        } catch (AmazonServiceException e) {
             e.printStackTrace();
-            throw new RecipeNotFoundException(e.getMessage());
-        } catch (Exception ex) {
-            log.error("Internal server error.");
+            throw new BadRequestException(e.getMessage());
+        } catch (AmazonClientException ex) {
+            ex.printStackTrace();
             throw new RecipeManagerException(ex.getMessage());
         }
 
@@ -117,10 +116,10 @@ public class RecipeDataFacade extends DataFacade {
             return getResponse(scanResult);
 
         } catch (AmazonServiceException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (JsonProcessingException | AmazonClientException ex) {
-            ex.printStackTrace();
+            log.error(ex.getMessage());
             throw new RecipeManagerException(ex.getMessage());
         }
 
@@ -152,10 +151,10 @@ public class RecipeDataFacade extends DataFacade {
             return getResponse(scanResult);
 
         } catch (AmazonServiceException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (JsonProcessingException | AmazonClientException ex) {
-            ex.printStackTrace();
+            log.error(ex.getMessage());
             throw new RecipeManagerException(ex.getMessage());
         }
 

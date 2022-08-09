@@ -26,19 +26,20 @@ public class RecipeService {
     @Autowired
     private RecipeDataFacade facade;
 
-    public void addRecipe(Recipe recipe) throws RecipeManagerException {
+    public Map<String, Object> addRecipe(Recipe recipe) throws RecipeManagerException {
         if (recipe != null) {
             try {
                 log.info("Add request received.");
                 String recipe_json = JsonUtil.toJson(recipe);
                 facade.createItem(recipe_json);
                 log.info("Add request completed.");
+                return getRecipe(recipe.getName());
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
                 throw new RecipeManagerException(e.getMessage());
             }
         } else {
-            throw new RecipeManagerException("Empty request cannot be processed.");
+            throw new BadRequestException("Empty request cannot be processed.");
         }
 
     }
@@ -51,7 +52,7 @@ public class RecipeService {
             facade.delete(keys);
             log.info("Delete request compeleted.");
         } else {
-            throw new RecipeManagerException("Empty request cannot be processed.");
+            throw new BadRequestException("Empty request cannot be processed.");
         }
 
     }
@@ -79,7 +80,7 @@ public class RecipeService {
                 throw new BadRequestException("Invalid recipe to update.");
             }
         } else {
-            throw new RecipeManagerException("Empty request cannot be processed.");
+            throw new BadRequestException("Empty request cannot be processed.");
         }
     }
 

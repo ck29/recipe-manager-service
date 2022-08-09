@@ -63,18 +63,20 @@ public class Filter {
                 Map<String, Object> attributeValues = new HashMap<>();
 
                 boolean isFirst = true;
+                int index = 0;
                 for(Map.Entry<String, String> entry : filterQuery.entrySet()){
                     String groupName = AllowedFilters.getGroupByKey(entry.getKey());
                     String value = entry.getValue();
 
-                    attributeNames.put("#" + groupName, groupName);
-                    attributeValues.put(":" + groupName, StringUtils.isNumeric(value) ? Integer.valueOf(value) : value);
+                    attributeNames.put("#" + index + groupName, groupName);
+                    attributeValues.put(":" + index + groupName, StringUtils.isNumeric(value) ? Integer.valueOf(value) : value);
 
                     if(!isFirst){
                         expression.append(" and ");
                     }
-                    expression.append(createExpression(groupName, entry.getKey()));
+                    expression.append(createExpression(index, groupName, entry.getKey()));
                     isFirst = false;
+                    index++;
                 }
                 this.expression = expression.toString();
                 this.attributeNames = attributeNames;
@@ -86,14 +88,14 @@ public class Filter {
         }
     }
 
-    private String createExpression(String group, String key) {
+    private String createExpression(int index, String group, String key) {
         String operator = getOperator(key);
         if(operator.equals("not-contains")){
-            return "NOT (contains(#" + group + "," + ":" + group + "))";
+            return "NOT (contains(#" + index + group + "," + ":" + index + group + "))";
         }else if(operator.equals("contains")){
-            return "contains(#" + group + "," + ":" + group + ")";
+            return "contains(#" + index + group + "," + ":" + index + group + ")";
         }else{
-            return "#" + group + " " + operator + " " + ":" + group;
+            return "#" + index + group + " " + operator + " " + ":" + index + group;
         }
     }
 
