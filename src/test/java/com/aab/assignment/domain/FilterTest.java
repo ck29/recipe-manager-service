@@ -37,4 +37,22 @@ public class FilterTest {
 
 
     }
+
+    @Test
+    public void testMultiParamFilter(){
+        Map<String, String> filter = new HashMap<String, String>(){{
+            put("minimum-serves","2");
+            put("type","veg");
+            put("ingredients-contains","tomato,cucumber,kiwi");
+        }};
+        Filter f = new Filter(filter);
+        Assert.assertEquals(f.getExpression(), "#0serves >= :0serves and contains(#1ingredients,:1ingredients) and contains(#2ingredients,:2ingredients) and contains(#3ingredients,:3ingredients) and #4type = :4type");
+        Assert.assertEquals(f.getAttributeNames().size(), 5);
+        Assert.assertEquals(f.getAttributeValues().size(), 5);
+
+
+
+
+
+    }
 }
