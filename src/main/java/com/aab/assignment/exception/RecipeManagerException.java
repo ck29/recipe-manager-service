@@ -1,6 +1,6 @@
 package com.aab.assignment.exception;
 
-public class RecipeManagerException extends Exception{
+public class RecipeManagerException extends RuntimeException{
     
     public RecipeManagerException() {
     }

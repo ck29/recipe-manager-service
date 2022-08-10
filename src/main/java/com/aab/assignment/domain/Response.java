@@ -2,10 +2,10 @@ package com.aab.assignment.domain;
 
 public class Response {
     
-    public String responseMessage;
+    public String message;
 
     public Response(String responseMessage) {
-        this.responseMessage = responseMessage;
+        this.message = responseMessage;
     } 
 
 }

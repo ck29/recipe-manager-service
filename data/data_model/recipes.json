@@ -1,13 +1,10 @@
 {
     "TableName": "recipes",
     "KeySchema": [
-      { "AttributeName": "type", "KeyType": "HASH" },
-      { "AttributeName": "name", "KeyType": "RANGE" }
+      { "AttributeName": "name", "KeyType": "HASH" }
     ],
     "AttributeDefinitions": [
-      { "AttributeName": "type", "AttributeType": "S" },
 	{ "AttributeName": "name", "AttributeType": "S" }
-      
     ],
     "ProvisionedThroughput": {
       "ReadCapacityUnits": 5,

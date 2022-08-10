@@ -1,15 +1,10 @@
 package com.aab.assignment.controller;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.aab.assignment.domain.Recipe;
+import com.aab.assignment.exception.*;
+import com.aab.assignment.service.RecipeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -17,21 +12,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.aab.assignment.domain.Recipe;
-import com.aab.assignment.exception.BadRequestException;
-import com.aab.assignment.exception.RecipeManagerException;
-import com.aab.assignment.exception.RecipeNotFoundException;
-import com.aab.assignment.service.RecipeService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import java.util.*;
 
-@RunWith(MockitoJUnitRunner.class)
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@RunWith(SpringJUnit4ClassRunner.class)
 public class RecipeControllerTest {
 
     private MockMvc mockmvc;
@@ -48,23 +41,26 @@ public class RecipeControllerTest {
     @BeforeEach
     public void setUp(){
         MockitoAnnotations.initMocks(this);
-        this.mockmvc = MockMvcBuilders.standaloneSetup(controller).build();
+        this.mockmvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new RecipeControllerAdvisor()).build();
     }
 
     @Test
     public void testAddRecipe() throws Exception {
         Recipe recipe = createRecipe();
-        
-        doNothing().when(service).addRecipe(recipe);
+        Map<String, Object> result = objectMapper.convertValue(recipe, Map.class);
+
+        doReturn(result).when(service).addRecipe(recipe);
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .post("/recipe/new")
+            .post("/recipe/")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
-            .andExpect(status().isCreated());
+            .andExpect(status().isCreated())
+                .andExpect(content().json(json));
         
     }
 
@@ -72,13 +68,15 @@ public class RecipeControllerTest {
     public void testAddRecipeInvalidInput() throws Exception {
         Recipe recipe = createRecipe();
         recipe.setServes(null);
-        doNothing().when(service).addRecipe(recipe);
+        Map<String, Object> result = objectMapper.convertValue(recipe, Map.class);
+
+        doReturn(result).when(service).addRecipe(recipe);
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .post("/recipe/new")
+            .post("/recipe/")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isBadRequest());
@@ -89,16 +87,16 @@ public class RecipeControllerTest {
     public void testAddRecipeAlreadyExists() throws Exception {
         Recipe recipe = createRecipe();
         
-        doThrow(new BadRequestException()).when(service).addRecipe(recipe);
+        doThrow(new RecipeAlreadyExistsException()).when(service).addRecipe(recipe);
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .post("/recipe/new")
+            .post("/recipe/")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isConflict());
         
     }
 
@@ -112,7 +110,7 @@ public class RecipeControllerTest {
         String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .post("/recipe/new")
+            .post("/recipe/")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isInternalServerError());
@@ -121,113 +119,106 @@ public class RecipeControllerTest {
 
     @Test
     public void deleteRecipe() throws Exception {
-        Recipe recipe = createRecipe();
-        
+        String recipe = "salad";
+
         doNothing().when(service).deleteRecipe(recipe);
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .delete("/recipe/delete")
+            .delete("/recipe/salad")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isOk());
-        
+
     }
 
     @Test
     public void deleteRecipeInvalidData() throws Exception {
+        doThrow(new BadRequestException()).when(service).deleteRecipe("salad");
+
+        mockmvc.perform(
+            MockMvcRequestBuilders
+            .delete("/recipe/salad")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(""))
+            .andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    public void deleteRecipeNotFound() throws Exception {
+        doThrow(new RecipeNotFoundException()).when(service).deleteRecipe("recipe");
+
+        mockmvc.perform(
+            MockMvcRequestBuilders
+            .delete("/recipe/recipe")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(""))
+            .andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void updateRecipe() throws Exception {
         Recipe recipe = createRecipe();
-        recipe.setType(null);
-        doNothing().when(service).deleteRecipe(recipe);
+
+        Map<String, Object> result = objectMapper.convertValue(recipe, Map.class);
+        doReturn(result).when(service).updateRecipe(recipe, "salad");
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .delete("/recipe/delete")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
-            .andExpect(status().isBadRequest());
-        
-    }
-
-    @Test
-    public void deleteRecipeNotFound() throws Exception {
-        Recipe recipe = createRecipe();
-        doThrow(new RecipeNotFoundException()).when(service).deleteRecipe(recipe);
-
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String json = ow.writeValueAsString(createRecipe());
-        mockmvc.perform(
-            MockMvcRequestBuilders
-            .delete("/recipe/delete")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
-            .andExpect(status().isNotFound());
-        
-    }
-
-    @Test
-    public void updateRecipe() throws Exception {
-        
-        Map<String, Recipe> updateRequest = createUpdateRequestIdenticalRecipe();
-        
-        doNothing().when(service).updateRecipe(updateRequest);
-
-        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String json = ow.writeValueAsString(updateRequest);
-        mockmvc.perform(
-            MockMvcRequestBuilders
-            .put("/recipe/edit")
+            .put("/recipe/salad")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isOk());
-        
+
     }
-    
+
     @Test
     public void updateRecipeWithNoChange() throws Exception {
-        
-        Map<String, Recipe> updateRequest = createUpdateRequestIdenticalRecipe();
-        
-       doThrow(new BadRequestException()).when(service).updateRecipe(updateRequest);
+
+        Recipe recipe = createRecipe();
+
+       doThrow(new BadRequestException()).when(service).updateRecipe(recipe, "salad");
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String json = ow.writeValueAsString(updateRequest);
+        String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .put("/recipe/edit")
+            .put("/recipe/salad")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isBadRequest());
-        
+
     }
 
     @Test
     public void updateRecipeNonExistent() throws Exception {
-        
-        Map<String, Recipe> updateRequest = createUpdateRequestIdenticalRecipe();
-        
-       doThrow(new RecipeNotFoundException()).when(service).updateRecipe(updateRequest);
+
+        Recipe recipe = createRecipe();
+
+       doThrow(new RecipeNotFoundException()).when(service).updateRecipe(recipe, "salad");
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-        String json = ow.writeValueAsString(updateRequest);
+        String json = ow.writeValueAsString(recipe);
         mockmvc.perform(
             MockMvcRequestBuilders
-            .put("/recipe/edit")
+            .put("/recipe/salad")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
             .andExpect(status().isNotFound());
-        
+
     }
 
     @Test
     public void getRecipe() throws Exception{
         List<Map<String, Object>> req = createResponseRecords();
-
-        Mockito.when(service.getRecepies()).thenReturn(req);
+        Map<String, String> filter = null;
+        Mockito.when(service.getRecepies(filter)).thenReturn(req);
         mockmvc.perform(
             MockMvcRequestBuilders
             .get("/recipe/")
@@ -244,27 +235,6 @@ public class RecipeControllerTest {
         recipe.setInstructions(new StringBuffer("Cut and put in bowl"));
         return recipe;
 
-    }
-
-    private  Map<String, Recipe>  createUpdateRequestIdenticalRecipe() {
-        Recipe exrecipe = new Recipe();
-        exrecipe.setName("salad");
-        exrecipe.setType("veg");
-        exrecipe.setIngredients(Arrays.asList("tomato", "raddish"));
-        exrecipe.setServes(2);
-        exrecipe.setInstructions(new StringBuffer("Cut and put in bowl"));
-
-        Recipe newrecipe = new Recipe();
-        newrecipe.setName("salad");
-        newrecipe.setType("veg");
-        newrecipe.setIngredients(Arrays.asList("tomato", "raddish"));
-        newrecipe.setServes(2);
-        newrecipe.setInstructions(new StringBuffer("Cut and put in bowl"));
-        
-        Map<String, Recipe> updateRequest = new HashMap<>();
-        updateRequest.put("existing", exrecipe);
-        updateRequest.put("new", newrecipe);
-        return updateRequest;
     }
 
     public List<Map<String, Object>> createResponseRecords(){

@@ -12,94 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"salad\",\r\n    \"type\": \"veg\",\r\n    \"ingredients\": [\r\n        \"tomato\",\r\n        \"raddish\"\r\n    ],\r\n    \"serves\": 2,\r\n    \"instructions\": \"cut and put in bowl.\"\r\n\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/recipe/new",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"recipe",
-						"new"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete Recipe",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"salad\",\r\n    \"type\": \"veg\"\r\n\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/recipe/delete",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"recipe",
-						"delete"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update Recipe",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"existing\":{\r\n        \"name\": \"veg salad\",\r\n        \"type\": \"veg\",\r\n        \"ingredients\": [\r\n            \"tomato\",\r\n            \"raddish\"\r\n        ],\r\n        \"serves\": 2,\r\n        \"instructions\": \"cut and put in bowl.\"\r\n    },\r\n    \"new\":{\r\n        \"name\": \"veg salad\",\r\n        \"type\": \"veg\",\r\n        \"ingredients\": [\r\n            \"raddish\",\r\n            \" tomato\"\r\n        ],\r\n        \"serves\": 3,\r\n        \"instructions\": \"cut and put in bowl.\"\r\n    }\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/recipe/edit",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"recipe",
-						"edit"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Recipes",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"expression\":\"(contains(#ins,:ins) and not(contains(#ingredients,:ingredients)))\",\r\n    \"attributeNames\": {\r\n        \"#ins\": \"instructions\",\r\n        \"#ingredients\": \"ingredients\"\r\n    },\r\n    \"attributeValues\":{\r\n        \":ingredients\": \"potato\",\r\n        \":ins\": \"fry\"\r\n    }\r\n}",
+					"raw": "{\r\n    \"name\": \"popcorn\",\r\n    \"type\": \"veg\",\r\n    \"ingredients\": [\r\n        \"corn\",\r\n        \"salt\"\r\n    ],\r\n    \"serves\": 4,\r\n    \"instructions\": \"bake\"\r\n\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -115,6 +28,98 @@
 					"path": [
 						"recipe",
 						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Recipe",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/recipe/soup",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"recipe",
+						"soup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Recipe",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"instructions\": \"grind and boil.\",\r\n        \"serves\": 4,\r\n        \"name\": \"chicken soup\",\r\n        \"ingredients\": [\r\n            \"tomato\",\r\n            \"cream\"\r\n        ],\r\n        \"type\": \"non veg\"\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/recipe/chicken soup",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"recipe",
+						"chicken soup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Recipes",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/recipe?type=veg",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"recipe"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "veg"
+						}
 					]
 				}
 			},
