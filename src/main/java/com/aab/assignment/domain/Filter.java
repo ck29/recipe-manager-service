@@ -64,7 +64,11 @@ public class Filter {
 
                 boolean isFirst = true;
                 int index = 0;
-                for(Map.Entry<String, String> entry : filterQuery.entrySet()){
+
+                List<FilterParam> filterParam = createQueryFilter(filterQuery);
+
+                for(FilterParam entry : filterParam){
+
                     String groupName = AllowedFilters.getGroupByKey(entry.getKey());
                     String value = entry.getValue();
 
@@ -86,6 +90,32 @@ public class Filter {
                 throw new BadRequestException("Invalid query paramters.");
             }
         }
+    }
+
+    private List<FilterParam> createQueryFilter(Map<String, String> filterQuery) {
+        List<FilterParam> qf = new ArrayList<>();
+        FilterParam f = null;
+
+        for(Map.Entry<String, String> entry : filterQuery.entrySet()){
+
+            String value = entry.getValue();
+
+            if(value.contains(",")){
+                StringTokenizer st = new StringTokenizer(value, ",");
+                while(st.hasMoreTokens()){
+                    f = new FilterParam();
+                    f.setKey(entry.getKey());
+                    f.setValue(st.nextToken());
+                    qf.add(f);
+                }
+            }else{
+                f = new FilterParam();
+                f.setKey(entry.getKey());
+                f.setValue(entry.getValue());
+                qf.add(f);
+            }
+        }
+        return qf;
     }
 
     private String createExpression(int index, String group, String key) {
