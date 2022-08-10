@@ -9,5 +9,9 @@ class RecipeManagerServiceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
+	@Test
+	public void applicationStarts() {
+		Application.main(new String[] {});
+	}
 
 }

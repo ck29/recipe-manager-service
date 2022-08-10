@@ -1,7 +1,5 @@
 package com.aab.assignment.domain;
 
-import java.util.Map;
-
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemUtils;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
@@ -9,6 +7,8 @@ import com.amazonaws.services.dynamodbv2.model.ScanRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+
+import java.util.Map;
 
 public class RecipeScanRequest extends ScanRequest {
 

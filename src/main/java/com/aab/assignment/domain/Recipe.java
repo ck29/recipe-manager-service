@@ -31,6 +31,7 @@ public class Recipe {
 
     @NotBlank(groups = { AddRecipeValidateGroup.class,
         UpdateRecipeValidateGroup.class }, message = "Recipe instructions are required.")
+
     public StringBuffer instructions;
 
     public String getType() {
@@ -90,6 +91,7 @@ public class Recipe {
         Recipe other = (Recipe) obj;
         return name.equals(other.name) 
                 && type.equals(other.type)
+                && serves==other.serves
                 && isIngredientsEqual(ingredients, other.ingredients) 
                 && instructions.toString().equals(other.instructions.toString());
     }

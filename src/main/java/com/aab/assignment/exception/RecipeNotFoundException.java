@@ -1,10 +1,12 @@
 package com.aab.assignment.exception;
 
-public class RecipeNotFoundException extends RecipeManagerException{
+public class RecipeNotFoundException extends RuntimeException{
+
     public RecipeNotFoundException() {
+        super("Recipe not found.");
     }
 
-    public RecipeNotFoundException (String errorMessage) {
-        super(errorMessage);
+    public RecipeNotFoundException(String message) {
+        super(message);
     }
 }
