@@ -1,262 +1,228 @@
 swagger: '2.0'
 info:
-  description: Api Documentation
+  description: "Api Documentation for Recipe Management App."
   version: '1.0'
-  title: Api Documentation
-  termsOfService: urn:tos
-  contact: {}
+  title: "Recipe Management Service"
+  termsOfService: 'urn:tos'
   license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0
-host: localhost:8080
+    name: 'Apache 2.0'
+    url: 'http://www.apache.org/licenses/LICENSE-2.0'
+
+host: 'localhost:8080'
 basePath: /
 tags:
-  - name: recipe-controller
-    description: Recipe Controller
+  - name: 'Recipe'
+    description: 'Recipe Management Service'
+
 paths:
-  
   /recipe:
     get:
       tags:
-        - recipe-controller
-      summary: getRecepies
-      operationId: getRecepiesUsingGET
+        - 'recipe'
+
+      summary: 'Get recipes'
+      operationId: 'getRecipes'
       produces:
-        - application/json
+        - 'application/json'
       parameters:
-        - in: body
-          name: filter
-          description: filter
+        - name: 'type'
+          in: 'query'
+          description: 'Provide recipe type'
           required: false
-          schema:
-            $ref: '#/definitions/Filter'
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-  /recipe/:
-    get:
-      tags:
-        - recipe-controller
-      summary: getRecepies
-      operationId: getRecepiesUsingGET_1
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: filter
-          description: filter
+          type: 'string'
+
+        - name: 'name'
+          in: 'query'
+          description: 'Provide recipe name'
           required: false
-          schema:
-            $ref: '#/definitions/Filter'
+          type: 'string'
+
+        - name: 'maximum-serves'
+          in: 'query'
+          description: 'Provide maximum serving'
+          required: false
+          type: 'string'
+
+        - name: 'minimum-serves'
+          in: 'query'
+          description: 'Provide minimum serving'
+          required: false
+          type: 'string'
+
+        - name: 'name-contains'
+          in: 'query'
+          description: 'Provide partial name.'
+          required: false
+          type: 'string'
+
+        - name: 'ingredients-contains'
+          in: 'query'
+          description: 'Provide included ingredients.'
+          required: false
+          type: 'string'
+
+        - name: 'ingredients-not-contains'
+          in: 'query'
+          description: 'Provide excluded ingredients.'
+          required: false
+          type: 'string'
+
+        - name: 'instructions-contains'
+          in: 'query'
+          description: 'Provide text contained in intructions.'
+          required: false
+          type: 'string'
+
+        - name: 'instructions-not-contains'
+          in: 'query'
+          description: 'Provide text excluded in intructions.'
+          required: false
+          type: 'string'
+
+
       responses:
-        '200':
-          description: OK
+        200:
+          description: "Successful"
           schema:
-            type: object
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-  /recipe/delete:
-    delete:
-      tags:
-        - recipe-controller
-      summary: deleteRecipe
-      operationId: deleteRecipeUsingDELETE
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: recipe
-          description: recipe
-          required: true
+            $ref: "#/definitions/Recipes"
+        500:
+          description: "Server error"
           schema:
-            $ref: '#/definitions/Recipe'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/Response'
-        '204':
-          description: No Content
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-  /recipe/edit:
-    put:
-      tags:
-        - recipe-controller
-      summary: editRecipe
-      operationId: editRecipeUsingPUT
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: updateRequest
-          description: updateRequest
-          required: true
-          schema:
-            type: object
-            additionalProperties:
-              $ref: '#/definitions/Recipe'
-      responses:
-        '200':
-          description: OK
-          schema:
-            $ref: '#/definitions/Response'
-        '201':
-          description: Created
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
-  /recipe/new:
+            $ref: "#/definitions/Error"
+
+
     post:
       tags:
-        - recipe-controller
-      summary: addRecipe
-      operationId: addRecipeUsingPOST
+        - "recipe"
+      summary: "Add new recipe"
+      operationId: "addRecipe"
       consumes:
-        - application/json
+        - "application/json"
       produces:
-        - application/json
+        - "application/json"
       parameters:
-        - in: body
-          name: recipe
-          description: recipe
+        - in: "body"
+          name: "recipe"
+          required: true
+          schema:
+            $ref: '#/definitions/Recipe'
+      responses:
+        201:
+          description: "Created"
+          schema:
+            $ref: "#/definitions/Recipe"
+        400:
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"
+        409:
+          description: "Already exists"
+          schema:
+            $ref: "#/definitions/Error"
+        500:
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/Error"
+
+  /recipe/{name}:
+    get:
+      tags:
+        - "recipe"
+      summary: "Get recipe by name"
+      operationId: 'getRecipe'
+      produces:
+        - 'application/json'
+      parameters:
+        - name: 'name'
+          in: 'path'
+          description: 'name'
+          required: true
+          type: 'string'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Recipe'
+        500:
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      tags:
+        - 'recipe'
+      summary: "Update recipe"
+      operationId: 'editRecipe'
+      consumes:
+        - 'application/json'
+      produces:
+        - 'application/json'
+      parameters:
+        - name: 'name'
+          in: path
+          description: 'Name of recipe'
+          required: true
+          type: 'string'
+        - in: 'body'
+          name: "body"
+          description: "Updated recipe"
           required: true
           schema:
             $ref: '#/definitions/Recipe'
       responses:
         '200':
-          description: OK
+          description: "OK"
+          schema:
+            $ref: "#/definitions/Recipe"
+        '404':
+          description: "Not Found"
+          schema:
+            $ref: "#/definitions/Error"
+        '400':
+          description: "Bad Request"
+          schema:
+            $ref: "#/definitions/Error"
+        '500':
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      tags:
+        - 'recipe'
+      summary: 'Delete recipe'
+      operationId: 'deleteRecipe'
+      produces:
+        - 'application/json'
+      parameters:
+        - name: 'name'
+          in: 'path'
+          description: 'Recipe name'
+          required: true
+          type: string
+      responses:
+        200:
+          description: "OK"
           schema:
             $ref: '#/definitions/Response'
-        '201':
-          description: Created
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden
-        '404':
-          description: Not Found
+        404:
+          description: "Recipe not found"
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: "Server Error"
+          schema:
+            $ref: "#/definitions/Error"
+
+
 definitions:
-  Filter:
-    type: object
+  Recipes:
+    type: array
+    items:
+      type: object
     properties:
-      attributeNames:
-        type: object
-        additionalProperties:
-          type: string
-      attributeValues:
-        type: object
-      expression:
-        type: string
-    title: Filter
-  ModelAndView:
-    type: object
-    properties:
-      empty:
-        type: boolean
-      model:
-        type: object
-      modelMap:
-        type: object
-        additionalProperties:
-          type: object
-      reference:
-        type: boolean
-      status:
-        type: string
-        enum:
-          - ACCEPTED
-          - ALREADY_REPORTED
-          - BAD_GATEWAY
-          - BAD_REQUEST
-          - BANDWIDTH_LIMIT_EXCEEDED
-          - CHECKPOINT
-          - CONFLICT
-          - CONTINUE
-          - CREATED
-          - DESTINATION_LOCKED
-          - EXPECTATION_FAILED
-          - FAILED_DEPENDENCY
-          - FORBIDDEN
-          - FOUND
-          - GATEWAY_TIMEOUT
-          - GONE
-          - HTTP_VERSION_NOT_SUPPORTED
-          - IM_USED
-          - INSUFFICIENT_SPACE_ON_RESOURCE
-          - INSUFFICIENT_STORAGE
-          - INTERNAL_SERVER_ERROR
-          - I_AM_A_TEAPOT
-          - LENGTH_REQUIRED
-          - LOCKED
-          - LOOP_DETECTED
-          - METHOD_FAILURE
-          - METHOD_NOT_ALLOWED
-          - MOVED_PERMANENTLY
-          - MOVED_TEMPORARILY
-          - MULTIPLE_CHOICES
-          - MULTI_STATUS
-          - NETWORK_AUTHENTICATION_REQUIRED
-          - NON_AUTHORITATIVE_INFORMATION
-          - NOT_ACCEPTABLE
-          - NOT_EXTENDED
-          - NOT_FOUND
-          - NOT_IMPLEMENTED
-          - NOT_MODIFIED
-          - NO_CONTENT
-          - OK
-          - PARTIAL_CONTENT
-          - PAYLOAD_TOO_LARGE
-          - PAYMENT_REQUIRED
-          - PERMANENT_REDIRECT
-          - PRECONDITION_FAILED
-          - PRECONDITION_REQUIRED
-          - PROCESSING
-          - PROXY_AUTHENTICATION_REQUIRED
-          - REQUESTED_RANGE_NOT_SATISFIABLE
-          - REQUEST_ENTITY_TOO_LARGE
-          - REQUEST_HEADER_FIELDS_TOO_LARGE
-          - REQUEST_TIMEOUT
-          - REQUEST_URI_TOO_LONG
-          - RESET_CONTENT
-          - SEE_OTHER
-          - SERVICE_UNAVAILABLE
-          - SWITCHING_PROTOCOLS
-          - TEMPORARY_REDIRECT
-          - TOO_EARLY
-          - TOO_MANY_REQUESTS
-          - UNAUTHORIZED
-          - UNAVAILABLE_FOR_LEGAL_REASONS
-          - UNPROCESSABLE_ENTITY
-          - UNSUPPORTED_MEDIA_TYPE
-          - UPGRADE_REQUIRED
-          - URI_TOO_LONG
-          - USE_PROXY
-          - VARIANT_ALSO_NEGOTIATES
-      view:
-        $ref: '#/definitions/View'
-      viewName:
-        type: string
-    title: ModelAndView
+      recipe:
+        $ref: '#/definitions/Recipe'
+    title: Recipes
+
   Recipe:
     type: object
     required:
@@ -264,13 +230,14 @@ definitions:
       - name
       - serves
       - type
+      - ingredients
     properties:
       ingredients:
         type: array
         items:
           type: string
       instructions:
-        $ref: '#/definitions/StringBuffer'
+        type: string
       name:
         type: string
       serves:
@@ -279,22 +246,26 @@ definitions:
       type:
         type: string
     title: Recipe
+
   Response:
     type: object
     properties:
-      responseMessage:
+      message:
         type: string
     title: Response
-  StringBuffer:
+
+
+  Error:
     type: object
+    required:
+      - timestamp
+      - message
+      - status
     properties:
-      length:
-        type: integer
-        format: int32
-    title: StringBuffer
-  View:
-    type: object
-    properties:
-      contentType:
+      timestamp:
         type: string
-    title: View
+      message:
+        type: string
+      status:
+        type: integer
+
