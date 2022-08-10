@@ -37,8 +37,8 @@ public class RecipeControllerAdvisor extends ResponseEntityExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("message", "Recipe already exists.");
-        body.put("status", 400);
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        body.put("status", 409);
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(BadRequestException.class)

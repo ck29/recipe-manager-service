@@ -87,7 +87,7 @@ public class RecipeControllerTest {
     public void testAddRecipeAlreadyExists() throws Exception {
         Recipe recipe = createRecipe();
         
-        doThrow(new BadRequestException()).when(service).addRecipe(recipe);
+        doThrow(new RecipeAlreadyExistsException()).when(service).addRecipe(recipe);
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(recipe);
@@ -96,7 +96,7 @@ public class RecipeControllerTest {
             .post("/recipe/")
             .contentType(MediaType.APPLICATION_JSON)
             .content(json))
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isConflict());
         
     }
 
@@ -183,7 +183,7 @@ public class RecipeControllerTest {
 
         Recipe recipe = createRecipe();
 
-       doThrow(new RecipeAlreadyExistsException()).when(service).updateRecipe(recipe, "salad");
+       doThrow(new BadRequestException()).when(service).updateRecipe(recipe, "salad");
 
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(recipe);
