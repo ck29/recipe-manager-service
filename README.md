@@ -156,72 +156,87 @@ Make sure the database and application is running before starting the integratio
 
 1. Once the application is running, we can query the API using various method. The details about the endpoints are available using openapi specification. The specification can be downloaded using following link.
    
-    [OPEN API SPECIFICATION](https://github.com/ck29/recipe-manager-service/blob/master/data/swagger/swagger.yml)
+    [OAS](https://github.com/ck29/recipe-manager-service/blob/master/data/swagger/swagger.yml)
 
 
 2. Run application using POSTMAN. Download and import POSTMAN package.
 
-   [POSTMAN PACKAGE](https://github.com/ck29/recipe-manager-service/blob/master/data/postman/Recipe%20Management.postman_collection.json)
+   [Postman package](https://github.com/ck29/recipe-manager-service/blob/master/data/postman/Recipe%20Management.postman_collection.json)
 
-### Filtering Recipes
+### Add Recipe
+```shell
+   POST /recipe/ HTTP/1.1
+   Host: localhost:8080
+   Content-Type: application/json
+   
+   {
+    "name": "popcorn",
+    "type": "veg",
+    "ingredients": [
+        "corn",
+        "salt"
+    ],
+    "serves": 4,
+    "instructions": ""
 
-The retrieve recipe operation comes with advanced filtering option. The filter data needs to be passed using body of HTTP request. The filter expression is backed by Amazon DynanamoDB
-Here are some examples of creating filters.
+}
+   ```
+
+### Get Recipe
+
 
 1. Get all veg recipes.
    ```shell
    GET /recipe/ HTTP/1.1
    Host: localhost:8080
    Content-Type: application/json
-   
-   {
-    "expression":"(#type=:type)",
-    "attributeNames": {
-        "#type": "type"
-    },
-    "attributeValues":{
-        ":type": "veg" 
-    }
-   }
    ```
-2. Serves 1 person and contains mushroom.
-   ```shell
-   GET /recipe/ HTTP/1.1
+2. Get recipe named "omlette".
+    ```shell
+   GET /recipe/omlette HTTP/1.1
    Host: localhost:8080
    Content-Type: application/json
-   
-   {
-    "expression":"(#serves=:serves and contains(#ingredients,:ingredients))",
-    "attributeNames": {
-        "#serves": "serves",
-        "#ingredients": "ingredients"
-    },
-    "attributeValues":{
-        ":ingredients": "mushroom",
-        ":serves": 1
-     }
-   }
    ```
 
-3. Doesn't contain potato and instruction has oven.
-    ```shell
-   GET /recipe/ HTTP/1.1
+4. Serves 1 person and contains mushroom.
+   ```shell
+   GET /recipe?maximum-serves=1&ingredients-contains=mushroom HTTP/1.1
    Host: localhost:8080
    Content-Type: application/json
-   
-   {
-    "expression":"(contains(#ins,:ins) and not(contains(#ingredients,:ingredients)))",
-    "attributeNames": {
-        "#ins": "instructions",
-        "#ingredients": "ingredients"
-    },
-    "attributeValues":{
-        ":ingredients": "potato",
-        ":ins": "oven"
-    }
-   }
+   ```
+
+5. Doesn't contain potato and instruction has oven.
+    ```shell
+   GET /recipe/ HTTP/1.1
+   Host: localhost:8080?ingredients-not-contains=potato&instructions-contains=oven
+   Content-Type: application/json
    ```
    
+### Update Recipe
+  ```shell
+   PUT /recipe/omlette HTTP/1.1
+   Host: localhost:8080
+   Content-Type: application/json
+   {
+    "name": "omlette",
+    "type": "non veg",
+    "ingredients": [
+        "eggs",
+        "onions",
+        "salt"
+    ],
+    "serves": 1,
+    "instructions": "fry on pan."
+
+  }
+   ```
+
+### Delete Recipe
+```shell
+   DELETE /recipe/omlette HTTP/1.1
+   Host: localhost:8080
+   Content-Type: application/json
+   ```
 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
