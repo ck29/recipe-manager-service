@@ -12,12 +12,10 @@ class TestIntegration(unittest.TestCase):
 
 
     def test_create_recipe(self):
-        url = "http://localhost:8080/recipe/new"
+        url = "http://localhost:8080/recipe/"
 
         data1 = data_store.create_item_request_1
         data2 = data_store.create_item_request_2
-        data3 = data_store.create_item_request_3
-        data4 = data_store.create_item_request_4
 
         headers = {
           'Content-Type': 'application/json'
@@ -29,11 +27,7 @@ class TestIntegration(unittest.TestCase):
         response = requests.request("POST", url, headers=headers, data=json.dumps(data2))
         assert response.status_code == 201
 
-        response = requests.request("POST", url, headers=headers, data=json.dumps(data3))
-        assert response.status_code == 201
 
-        response = requests.request("POST", url, headers=headers, data=json.dumps(data4))
-        assert response.status_code == 201
 
     def test_get_recipe_without_filter(self):
         url = "http://localhost:8080/recipe/"
@@ -42,61 +36,100 @@ class TestIntegration(unittest.TestCase):
         }
 
         response = requests.request("GET", url, headers=headers)
-        print(json.loads(response.text))
-        assert len(json.loads(response.text)) == 4
+        assert len(json.loads(response.text)) == 2
 
-    def test_get_recipe_with_filter(self):
-        url = "http://localhost:8080/recipe/"
+        url = "http://localhost:8080/recipe/?type=veg"
         headers = {
             'Content-Type': 'application/json'
         }
-        filter = data_store.get_recipe_filter_all_veg_items
 
-        response = requests.request("GET", url, headers=headers, data= json.dumps(filter))
-        assert len(json.loads(response.text)) == 2
+        response = requests.request("GET", url, headers=headers)
+        assert len(json.loads(response.text)) == 1
 
         response_list = json.loads(response.text)
         for r in response_list:
             assert r["type"] == "veg"
 
+
+        #Delete recipe
+        url = "http://localhost:8080/recipe/fries"
+        response = requests.request("DELETE", url, headers=headers)
+        assert response.status_code == 200
+
+        #Delete recipe
+        url = "http://localhost:8080/recipe/omlet"
+        response = requests.request("DELETE", url, headers=headers)
+        assert response.status_code == 200
+
+
     def test_update_recipe(self):
-        url = "http://localhost:8080/recipe/edit"
+
+        #Add new recipe
+        url = "http://localhost:8080/recipe/"
         headers = {
             'Content-Type': 'application/json'
         }
-        data = data_store.update_recipe_request
 
+        data3 = data_store.create_item_request_3
+        response = requests.request("POST", url, headers=headers, data=json.dumps(data3))
+        assert response.status_code == 201
+
+        #Update recipe
+
+        url = "http://localhost:8080/recipe/pizza"
+        data = data_store.update_recipe_request
         response = requests.request("PUT", url, headers=headers, data= json.dumps(data))
+        assert response.status_code == 200
+
+        #Delete Recipe
+        response = requests.request("DELETE", url, headers=headers)
         assert response.status_code == 200
 
     def test_update_recipe_same_recipe(self):
-        url = "http://localhost:8080/recipe/edit"
+        #Add new recipe
+        url = "http://localhost:8080/recipe/"
         headers = {
             'Content-Type': 'application/json'
         }
-        data = data_store.update_recipe_request_2
+        data4 = data_store.create_item_request_4
+        response = requests.request("POST", url, headers=headers, data=json.dumps(data4))
+        assert response.status_code == 201
 
+        #update recipe
+        url = "http://localhost:8080/recipe/soup"
+        data = data_store.update_recipe_request_2
         response = requests.request("PUT", url, headers=headers, data= json.dumps(data))
         assert response.status_code == 400
 
-    def test_delete_recipe(self):
-        url = "http://localhost:8080/recipe/delete"
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        data = data_store.delete_recipe_request
-
-        response = requests.request("DELETE", url, headers=headers, data= json.dumps(data))
+        #Delete Recipe
+        response = requests.request("DELETE", url, headers=headers)
         assert response.status_code == 200
 
-    def test_delete_recipe_non_existent_recipe(self):
-        url = "http://localhost:8080/recipe/delete"
+    def test_delete_recipe(self):
+        #Add recipe
+        url = "http://localhost:8080/recipe/"
         headers = {
             'Content-Type': 'application/json'
         }
-        data = data_store.delete_recipe_request_2
+        data4 = data_store.create_item_request_5
+        response = requests.request("POST", url, headers=headers, data=json.dumps(data4))
 
-        response = requests.request("DELETE", url, headers=headers, data= json.dumps(data))
+        #Delete recipe
+        url = "http://localhost:8080/recipe/popcorn"
+        response = requests.request("DELETE", url, headers=headers)
+        assert response.status_code == 200
+
+
+
+
+def test_delete_recipe_non_existent_recipe(self):
+        url = "http://localhost:8080/recipe/salad"
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request("DELETE", url, headers=headers)
+
         assert response.status_code == 404
 
 
