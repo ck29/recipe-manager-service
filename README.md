@@ -124,7 +124,7 @@ Make sure the following tools are installed on your local machine.
      ```shell
      docker run -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -dbPath . -sharedDb
      ```
-### Installation using jar
+### or Installation using jar
 1. Download jar by navigating to Gitactions. Open latest build and download artifact.
 2. Extract the zip file and start application
    ```shell
@@ -135,17 +135,19 @@ Make sure the following tools are installed on your local machine.
    docker run -p 8000:8000 amazon/dynamodb-local -jar DynamoDBLocal.jar -dbPath . -sharedDb
    ```
 
-### Installation via docker
+### or Installation via docker
     coming soon
+
+### Create Table
+    cd recipe-manager-service
+    aws dynamodb create-table --cli-input-json file://data/data_model/recipes.json --endpoint-url http://localhost:8000
+    
+
 ### Integration Test
 Make sure the database and application is running before starting the integration tests.
 
-1. Create table
-   ```shell
-   cd recipe-manager-service
-   aws dynamodb create-table --cli-input-json file://data/data_model/recipes.json --endpoint-url http://localhost:8000
-   ```
-2. Run tests
+  
+#### Run tests
    ```
    python3 integration/tests/integration_tests.py
    ```
