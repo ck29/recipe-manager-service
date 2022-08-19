@@ -3,7 +3,7 @@ package com.aab.assignment.exception;
 public class RecipeNotFoundException extends RuntimeException{
 
     public RecipeNotFoundException() {
-        super("Recipe not found.");
+        super();
     }
 
     public RecipeNotFoundException(String message) {
