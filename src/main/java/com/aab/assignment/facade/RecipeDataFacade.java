@@ -1,7 +1,9 @@
 package com.aab.assignment.facade;
 
 import com.aab.assignment.domain.Filter;
+import com.aab.assignment.domain.RecipeQueryRequest;
 import com.aab.assignment.domain.RecipeScanRequest.RecipeScanRequestBuilder;
+import com.aab.assignment.domain.RecipeQueryRequest.RecipeQueryRequestBuilder;
 import com.aab.assignment.exception.BadRequestException;
 import com.aab.assignment.exception.RecipeAlreadyExistsException;
 import com.aab.assignment.exception.RecipeManagerException;
@@ -80,11 +82,11 @@ public class RecipeDataFacade extends DataFacade {
             DeleteItemRequest deleteItemRequest = createDeleteItemRequest(updateKeys);
             client.getClient().deleteItem(deleteItemRequest);
         } catch (AmazonServiceException e) {
-            e.printStackTrace();
-            throw new BadRequestException(e.getMessage());
+            log.error(e.getMessage());
+            throw new RecipeNotFoundException();
         } catch (AmazonClientException ex) {
             ex.printStackTrace();
-            throw new RecipeManagerException(ex.getMessage());
+            throw new RecipeManagerException();
         }
 
     }
@@ -117,18 +119,26 @@ public class RecipeDataFacade extends DataFacade {
 
         } catch (AmazonServiceException e) {
             log.error(e.getMessage());
-            throw new BadRequestException(e.getMessage());
+            throw new RecipeManagerException();
         } catch (JsonProcessingException | AmazonClientException ex) {
             log.error(ex.getMessage());
-            throw new RecipeManagerException(ex.getMessage());
+            throw new RecipeManagerException();
         }
 
     }
 
-    private List<Map<String, Object>> getResponse(ScanResult result) throws RecipeManagerException {
+    private List<Map<String, Object>> getResponse(Object result) throws RecipeManagerException {
         if(result!=null){
             List<Map<String, Object>> __ = new ArrayList<>();
-            for (Map<String, AttributeValue> rec : result.getItems()) {
+            List<Map<String, AttributeValue>> recList;
+
+            if(result instanceof ScanResult){
+                recList =  ((ScanResult) result).getItems();
+            } else {
+                recList =  ((QueryResult) result).getItems();
+            }
+
+            for (Map<String, AttributeValue> rec : recList) {
                 __.add(ItemUtils.toSimpleMapValue(rec));
             }
             return __;
@@ -154,6 +164,25 @@ public class RecipeDataFacade extends DataFacade {
             log.error(e.getMessage());
             throw new BadRequestException(e.getMessage());
         } catch (JsonProcessingException | AmazonClientException ex) {
+            log.error(ex.getMessage());
+            throw new RecipeManagerException(ex.getMessage());
+        }
+
+    }
+
+    public List<Map<String,Object>> query(String key) throws BadRequestException, RecipeManagerException {
+        QueryRequest queryRequest;
+        try{
+            queryRequest = RecipeQueryRequestBuilder.aRecipeQueryRequest()
+                    .withTableName(TABLE)
+                    .withName(key)
+                    .build();
+            QueryResult queryResult = client.getClient().query(queryRequest);
+            return getResponse(queryResult);
+        } catch (AmazonServiceException e) {
+            log.error(e.getMessage());
+            throw new RecipeManagerException(e.getMessage());
+        } catch (AmazonClientException ex) {
             log.error(ex.getMessage());
             throw new RecipeManagerException(ex.getMessage());
         }
