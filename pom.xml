@@ -13,7 +13,7 @@
 	<name>recipe-manager-service</name>
 	<description>API to manager recipe.</description>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>8</java.version>
 	</properties>
 	
 	<dependencyManagement>
