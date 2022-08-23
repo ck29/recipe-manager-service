@@ -1,4 +1,4 @@
-swagger: '2.0'
+openapi: '3.0.2'
 info:
   description: "Api Documentation for Recipe Management App."
   version: '1.0'
@@ -8,87 +8,105 @@ info:
     name: 'Apache 2.0'
     url: 'http://www.apache.org/licenses/LICENSE-2.0'
 
-host: 'localhost:8080'
-basePath: /
+servers:
+  - url: 'http://localhost:8080/'
+
 tags:
-  - name: 'Recipe'
-    description: 'Recipe Management Service'
+  - name: Recipe
+    description: Recipe Management Service
 
 paths:
   /recipe:
     get:
       tags:
-        - 'recipe'
+        - recipe
 
-      summary: 'Get recipes'
-      operationId: 'getRecipes'
-      produces:
-        - 'application/json'
+      summary: Get recipes
+      operationId: getRecipes
+
       parameters:
-        - name: 'type'
-          in: 'query'
-          description: 'Provide recipe type'
+        - name: type
+          in: query
+          description: Provide recipe type
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'name'
           in: 'query'
           description: 'Provide recipe name'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'maximum-serves'
           in: 'query'
           description: 'Provide maximum serving'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'minimum-serves'
           in: 'query'
           description: 'Provide minimum serving'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'name-contains'
           in: 'query'
           description: 'Provide partial name.'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'ingredients-contains'
           in: 'query'
           description: 'Provide included ingredients.'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'ingredients-not-contains'
           in: 'query'
           description: 'Provide excluded ingredients.'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'instructions-contains'
           in: 'query'
           description: 'Provide text contained in intructions.'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
         - name: 'instructions-not-contains'
           in: 'query'
           description: 'Provide text excluded in intructions.'
           required: false
-          type: 'string'
+          schema:
+            type: string
 
 
       responses:
-        200:
+        '200':
           description: "Successful"
-          schema:
-            $ref: "#/definitions/Recipes"
-        500:
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Recipes"
+
+        '500':
           description: "Server error"
-          schema:
-            $ref: "#/definitions/Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Error"
 
 
     post:
@@ -96,33 +114,44 @@ paths:
         - "recipe"
       summary: "Add new recipe"
       operationId: "addRecipe"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      parameters:
-        - in: "body"
-          name: "recipe"
-          required: true
-          schema:
-            $ref: '#/definitions/Recipe'
+      requestBody:
+        description: Recipe to add.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
       responses:
-        201:
+        '201':
           description: "Created"
-          schema:
-            $ref: "#/definitions/Recipe"
-        400:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Recipe"
+        '400':
           description: "Bad request"
-          schema:
-            $ref: "#/definitions/Error"
-        409:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
+
+        '409':
           description: "Already exists"
-          schema:
-            $ref: "#/definitions/Error"
-        500:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
+
+        '500':
           description: "Server Error"
-          schema:
-            $ref: "#/definitions/Error"
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
+
 
   /recipe/{name}:
     get:
@@ -130,142 +159,163 @@ paths:
         - "recipe"
       summary: "Get recipe by name"
       operationId: 'getRecipe'
-      produces:
-        - 'application/json'
       parameters:
         - name: 'name'
           in: 'path'
           description: 'name'
           required: true
-          type: 'string'
+          schema:
+            type: 'string'
       responses:
-        200:
-          description: OK
-          schema:
-            $ref: '#/definitions/Recipe'
-        500:
+        '200':
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Recipe"
+        '500':
           description: "Server Error"
-          schema:
-            $ref: "#/definitions/Error"
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
     put:
       tags:
         - 'recipe'
       summary: "Update recipe"
       operationId: 'editRecipe'
-      consumes:
-        - 'application/json'
-      produces:
-        - 'application/json'
+      requestBody:
+        description: Recipe to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
       parameters:
         - name: 'name'
           in: path
           description: 'Name of recipe'
           required: true
-          type: 'string'
-        - in: 'body'
-          name: "body"
-          description: "Updated recipe"
-          required: true
           schema:
-            $ref: '#/definitions/Recipe'
+            type: 'string'
+
       responses:
         '200':
-          description: "OK"
-          schema:
-            $ref: "#/definitions/Recipe"
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Recipe"
         '404':
-          description: "Not Found"
-          schema:
-            $ref: "#/definitions/Error"
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Recipe"
         '400':
-          description: "Bad Request"
-          schema:
-            $ref: "#/definitions/Error"
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
+
         '500':
           description: "Server Error"
-          schema:
-            $ref: "#/definitions/Error"
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
     delete:
       tags:
         - 'recipe'
       summary: 'Delete recipe'
       operationId: 'deleteRecipe'
-      produces:
-        - 'application/json'
       parameters:
         - name: 'name'
           in: 'path'
           description: 'Recipe name'
           required: true
-          type: string
+          schema:
+            type: string
       responses:
-        200:
-          description: "OK"
-          schema:
-            $ref: '#/definitions/Response'
-        404:
-          description: "Recipe not found"
-          schema:
-            $ref: '#/definitions/Error'
-        500:
+        '200':
+          description: "Successful"
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Recipe"
+        '404':
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Recipe"
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
+
+        '500':
           description: "Server Error"
-          schema:
-            $ref: "#/definitions/Error"
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: "#/components/schemas/Error"
 
 
-definitions:
-  Recipes:
-    type: array
-    items:
+components:
+  schemas:
+    Recipes:
+      type: array
+      title: Recipes
+      items:
+        $ref: '#/components/schemas/Recipe'
+
+    Recipe:
       type: object
-    properties:
-      recipe:
-        $ref: '#/definitions/Recipe'
-    title: Recipes
-
-  Recipe:
-    type: object
-    required:
-      - instructions
-      - name
-      - serves
-      - type
-      - ingredients
-    properties:
-      ingredients:
-        type: array
-        items:
+      title: Recipe
+      properties:
+        ingredients:
+          type: array
+          items:
+            type: string
+        instructions:
           type: string
-      instructions:
-        type: string
-      name:
-        type: string
-      serves:
-        type: integer
-        format: int32
-      type:
-        type: string
-    title: Recipe
+        name:
+          type: string
+        serves:
+          type: integer
+          format: int32
+        type:
+          type: string
 
-  Response:
-    type: object
-    properties:
-      message:
-        type: string
-    title: Response
-
-
-  Error:
-    type: object
-    required:
-      - timestamp
-      - message
-      - status
-    properties:
-      timestamp:
-        type: string
-      message:
-        type: string
-      status:
-        type: integer
+    Error:
+      type: object
+      required:
+        - timestamp
+        - message
+        - status
+      properties:
+        timestamp:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer
 

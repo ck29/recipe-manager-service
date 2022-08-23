@@ -162,7 +162,7 @@ public class RecipeDataFacade extends DataFacade {
 
         } catch (AmazonServiceException e) {
             log.error(e.getMessage());
-            throw new BadRequestException(e.getMessage());
+            throw new RecipeManagerException(e.getMessage());
         } catch (JsonProcessingException | AmazonClientException ex) {
             log.error(ex.getMessage());
             throw new RecipeManagerException(ex.getMessage());

@@ -241,7 +241,7 @@ public class RecipeDataFacadeTest {
         try{
             facade.scan(queryfilter);
             assert(false);
-        }catch(BadRequestException e){
+        }catch(RecipeManagerException e){
             assert(true);
         }
 
