@@ -4,8 +4,10 @@ import com.aab.assignment.domain.Filter;
 import com.aab.assignment.domain.Recipe;
 import com.aab.assignment.exception.BadRequestException;
 import com.aab.assignment.exception.RecipeManagerException;
+import com.aab.assignment.exception.RecipeNotFoundException;
 import com.aab.assignment.facade.RecipeDataFacade;
 import com.aab.assignment.utils.JsonUtil;
+import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -103,11 +105,9 @@ public class RecipeService {
 
     public Map<String, Object> getRecipe(String name) throws BadRequestException, RecipeManagerException {
         if (StringUtils.isNotEmpty(name)) {
-            Map<String, String> filter = new HashMap<>();
-            filter.put("name", name);
-            List<Map<String, Object>> scanList = facade.scan(filter);
+            List<Map<String, Object>> scanList = facade.query(name);
             if(scanList.isEmpty()){
-                return new HashMap<>();
+                throw new RecipeNotFoundException("Recipe not found.");
             }else{
                 return scanList.get(0);
             }

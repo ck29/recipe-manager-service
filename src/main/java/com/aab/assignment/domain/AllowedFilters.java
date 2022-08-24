@@ -10,7 +10,6 @@ public enum AllowedFilters {
     MinimumServes("minimum-serves", "serves"),
     MaximumServes("maximum-serves", "serves"),
     Type("type", "type"),
-    Name("name", "name"),
     NameContains("name-contains", "name"),
     IngredientsContains("ingredients-contains", "ingredients"),
     IngredientsNotContains("ingredients-not-contains", "ingredients"),

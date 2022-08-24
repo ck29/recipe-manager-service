@@ -3,6 +3,7 @@ package com.aab.assignment.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,7 +59,7 @@ public class RecipeControllerAdvisor extends ResponseEntityExceptionHandler {
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("message", ex.getMessage());
+        body.put("message", "Something went wrong. Try again later.");
         body.put("status", 500);
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -80,6 +81,21 @@ public class RecipeControllerAdvisor extends ResponseEntityExceptionHandler {
                         .collect(Collectors.toList());
 
         body.put("errors", errors);
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDate.now());
+        body.put("status", status.value());
+        body.put("errors", "Empty message body.");
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }

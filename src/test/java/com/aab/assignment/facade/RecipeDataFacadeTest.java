@@ -174,7 +174,7 @@ public class RecipeDataFacadeTest {
         try{
             facade.scan();
             assert(false);
-        }catch(BadRequestException e){
+        }catch(RecipeManagerException e){
             assert(true);
         }
 
@@ -192,19 +192,16 @@ public class RecipeDataFacadeTest {
 
         Map<String,String> queryfilter = new HashMap<String, String>(){{
             put("type","veg");
-            put("name","salad");
         }};
 
         Filter filter = new Filter();
-        filter.setExpression("#type=:type And #name=:name");
+        filter.setExpression("#type=:type");
 
         Map<String, String> attrName = new HashMap<>();
         attrName.put("#type", "type");
-        attrName.put("#name", "name");
 
         Map<String, Object> attrValue = new HashMap<>();
         attrValue.put(":type","veg");
-        attrValue.put(":name","salad");
         filter.setAttributeNames(attrName);
         filter.setAttributeValues(attrValue);
 
@@ -244,7 +241,7 @@ public class RecipeDataFacadeTest {
         try{
             facade.scan(queryfilter);
             assert(false);
-        }catch(BadRequestException e){
+        }catch(RecipeManagerException e){
             assert(true);
         }
 

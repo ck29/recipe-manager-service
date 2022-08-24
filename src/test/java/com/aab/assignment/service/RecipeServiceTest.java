@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.matchers.NotNull;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import com.aab.assignment.domain.Filter;
@@ -44,6 +45,7 @@ public class RecipeServiceTest {
         String req = "{\"instructions\":\"fry on pan.\",\"serves\":1,\"name\":\"omlet\",\"ingredients\":[\"egg\",\"onion\"],\"type\":\"non veg\"}";
         Recipe reqRecipe = JsonUtil.toObject(req, Recipe.class);
         doNothing().when(facade).createItem(req);
+        when(facade.query("omlet")).thenReturn(Arrays.asList(JsonUtil.toObject(req, Map.class)));
         try {
             service.addRecipe(reqRecipe);
             assert(true);
@@ -136,10 +138,7 @@ public class RecipeServiceTest {
         List<Map<String, Object>> rList = new ArrayList<>();
         rList.add(r);
 
-        Map<String, String> filter = new HashMap<String, String>(){{
-            put("name","veg salad");
-        }};
-        doReturn(rList).when(facade).scan(filter);
+        doReturn(rList).when(facade).query("veg salad");
         try {
             service.updateRecipe(newR,"veg salad");
             assert(true);
@@ -166,10 +165,7 @@ public class RecipeServiceTest {
         List<Map<String, Object>> rList = new ArrayList<>();
         rList.add(r);
 
-        Map<String, String> filter = new HashMap<String, String>(){{
-            put("name","veg salad");
-        }};
-        doReturn(rList).when(facade).scan(filter);
+        doReturn(rList).when(facade).query("veg salad");
         try {
             service.updateRecipe(newR, "veg salad");
             assert(false);

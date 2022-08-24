@@ -36,7 +36,7 @@ class TestIntegration(unittest.TestCase):
         }
 
         response = requests.request("GET", url, headers=headers)
-        assert len(json.loads(response.text)) == 2
+        assert len(json.loads(response.text)) >=2
 
         url = "http://localhost:8080/recipe/?type=veg"
         headers = {
@@ -44,8 +44,6 @@ class TestIntegration(unittest.TestCase):
         }
 
         response = requests.request("GET", url, headers=headers)
-        assert len(json.loads(response.text)) == 1
-
         response_list = json.loads(response.text)
         for r in response_list:
             assert r["type"] == "veg"

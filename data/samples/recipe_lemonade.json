@@ -1,0 +1,10 @@
+{
+  "name": "lemonade",
+  "type": "veg",
+  "ingredients": [
+    "lemon",
+    "salt"
+  ],
+  "serves": 1,
+  "instructions": "squeeze the lemon and add salt."
+}

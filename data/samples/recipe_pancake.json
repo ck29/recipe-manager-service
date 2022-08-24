@@ -1,0 +1,10 @@
+{
+  "name": "pancake",
+  "type": "veg",
+  "ingredients": [
+    "batter",
+    "honey"
+  ],
+  "serves": 2,
+  "instructions": "Cook the batter on pan and serve with honey."
+}
